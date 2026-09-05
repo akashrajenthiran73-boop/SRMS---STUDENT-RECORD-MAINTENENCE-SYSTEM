@@ -1,4 +1,11 @@
 <?php
+// Output buffering initialize panni warnings/headers errors-a prevent panrom
+ob_start();
+
+// Production warnings screen-la display aagama hide panrom
+error_reporting(0);
+ini_set('display_errors', 0);
+
 // Session check
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -38,7 +45,6 @@ if (isset($_POST['login'])) {
     $email    = trim($_POST['email']);
     $password = $_POST['password'];
     $role     = trim($_POST['role']);
-    // Student Form-ல் இருந்து Register Number-ஐ வாங்குறோம்
     $reg_no   = trim($_POST['reg_no'] ?? '');
 
     // Fetch user by email only from Supabase
@@ -69,21 +75,20 @@ if (isset($_POST['login'])) {
     // 2. Validate Email, Password & Role Match
     if ($user && password_verify($password, $user['password']) && strtolower($user['role']) === strtolower($role)) {
         
-        // 🛑 STRICT REGISTER NUMBER VALIDATION FOR STUDENT
+        // STRICT REGISTER NUMBER VALIDATION FOR STUDENT
         if (strtolower($role) === 'student') {
             $db_reg_no = trim($user['reg_no'] ?? '');
             
-            // Student-க்கு Form-ல் கொடுத்த Reg No-வும் DB-ல் இருக்கும் Reg No-வும் ஒத்துப் போக வேண்டும்
             if (empty($reg_no) || $db_reg_no !== $reg_no) {
                 echo "<script>alert('Invalid Register Number! Please enter your correct Register Number.'); window.location='login.php';</script>";
                 exit;
             }
         }
 
-        // Regenerate Session ID for security (Prevents Session Fixation)
+        // Regenerate Session ID for security
         session_regenerate_id(true);
 
-        // Remember Me Logic (Added HttpOnly flag for security)
+        // Remember Me Logic
         if (isset($_POST['remember'])) {
             setcookie('remember_email', $email, [
                 'expires'  => time() + (86400 * 30),
@@ -97,7 +102,7 @@ if (isset($_POST['login'])) {
             }
         }
 
-        // Set Session Data (Email & Register No Next Process-க்கு கண்டிப்பா தேவை)
+        // Set Session Data
         $_SESSION['user_id']      = $user['id'] ?? '';
         $_SESSION['role']         = $user['role'];
         $_SESSION['name']         = $user['name'] ?? '';
@@ -123,4 +128,5 @@ if (isset($_POST['login'])) {
         exit;
     }
 }
+ob_end_flush();
 ?>

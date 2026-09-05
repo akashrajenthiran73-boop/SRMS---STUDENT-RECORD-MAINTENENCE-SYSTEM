@@ -1,0 +1,21 @@
+{
+    "require": {
+        "supabase/supabase-php": "^0.0.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "SRMS\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SRMS\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "php phpunit.phar --testdox"
+    }
+}

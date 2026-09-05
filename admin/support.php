@@ -1,0 +1,604 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Login Check
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
+    header("Location: ../auth/login.php");
+    exit();
+}
+
+$role = $_SESSION['role'];
+$user_email = $_SESSION['email'] ?? $_SESSION['user_email'] ?? '';
+$is_admin = in_array($role, ['Admin', 'Super Admin']);
+
+// Supabase Credentials
+$env_path = __DIR__ . '/../.env';
+$SUPABASE_URL = '';
+$SUPABASE_KEY = '';
+
+if (file_exists($env_path)) {
+    $env = parse_ini_file($env_path);
+    $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
+    $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
+}
+
+// --- 1. CREATE TICKET (Students / Faculty) ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_ticket') {
+    $subject = trim($_POST['subject'] ?? '');
+    $message = trim($_POST['message'] ?? '');
+
+    $payload = [
+        'user_email' => $user_email,
+        'user_role'  => $role,
+        'subject'    => $subject,
+        'message'    => $message,
+        'status'     => 'Pending'
+    ];
+
+    $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/support_tickets";
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "apikey: $SUPABASE_KEY",
+        "Authorization: Bearer $SUPABASE_KEY",
+        "Content-Type: application/json",
+        "Prefer: return=minimal"
+    ]);
+
+    curl_exec($ch);
+    curl_close($ch);
+
+    header("Location: support.php?msg=submitted");
+    exit();
+}
+
+// --- 2. ADMIN RESOLVE TICKET ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'resolve_ticket' && $is_admin) {
+    $ticket_id   = $_POST['ticket_id'] ?? '';
+    $admin_reply = trim($_POST['admin_reply'] ?? '');
+
+    if (!empty($ticket_id)) {
+        $payload = [
+            'admin_reply' => $admin_reply,
+            'status'      => 'Resolved'
+        ];
+
+        $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/support_tickets?id=eq." . urlencode($ticket_id);
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "apikey: $SUPABASE_KEY",
+            "Authorization: Bearer $SUPABASE_KEY",
+            "Content-Type: application/json"
+        ]);
+
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
+    header("Location: support.php?msg=resolved");
+    exit();
+}
+
+// --- 3. FETCH TICKETS ---
+$tickets = [];
+if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
+    // Admin sees all tickets, users see only their tickets
+    $filter = $is_admin ? "" : "?user_email=eq." . urlencode($user_email);
+    $fetch_url = rtrim($SUPABASE_URL, '/') . "/rest/v1/support_tickets" . $filter . ($is_admin ? "?order=id.desc" : "&order=id.desc");
+
+    $ch = curl_init($fetch_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "apikey: $SUPABASE_KEY",
+        "Authorization: Bearer $SUPABASE_KEY"
+    ]);
+    $res = curl_exec($ch);
+    curl_close($ch);
+    $tickets = json_decode($res, true) ?? [];
+}
+
+// Sidebar Dashboard Routing
+$dashboard_url = 'dashboard_student.php';
+if ($is_admin) {
+    $dashboard_url = 'dashboard_admin.php';
+} elseif ($role === 'Faculty' || $role === 'HOD') {
+    $dashboard_url = 'dashboard_faculty.php';
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help & Support - Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: #F8FAFC;
+    color: #1E293B;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: #0B132B;
+    color: white;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.05);
+    z-index: 100;
+}
+
+.sidebar-brand {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+.sidebar-brand h2 {
+    color: #F59E0B;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.sidebar-brand span {
+    font-size: 11px;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    display: block;
+    margin-top: 4px;
+}
+
+.sidebar-nav-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-top: 15px;
+    padding-right: 4px;
+}
+
+.sidebar-nav-container::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar-nav-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.sidebar-menu {
+    list-style: none;
+}
+
+.sidebar-menu li {
+    margin-bottom: 4px;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #94A3B8;
+    padding: 11px 16px;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+}
+
+.sidebar-menu a:hover {
+    color: #F8FAFC;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-menu a.active {
+    background: #2563EB;
+    color: #FFFFFF;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.sidebar-menu a i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.menu-divider {
+    margin: 14px 10px;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.menu-heading {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #64748B;
+    padding: 6px 14px;
+    letter-spacing: 1.2px;
+    font-weight: 700;
+}
+
+.sidebar-footer {
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px;
+}
+
+/* Main Content Area */
+.main-content {
+    margin-left: 260px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.navbar {
+    background: #FFFFFF;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #E2E8F0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+.navbar h1 {
+    color: #1E3A8A;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+.user-profile-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #EFF6FF;
+    padding: 7px 16px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1E40AF;
+    border: 1px solid #BFDBFE;
+}
+.user-profile-badge i {
+    color: #2563EB;
+}
+
+.content-body {
+    padding: 35px 40px;
+    display: grid;
+    grid-template-columns: <?php echo $is_admin ? '1fr' : '380px 1fr'; ?>;
+    gap: 28px;
+    align-items: start;
+}
+
+.card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+}
+
+.card-title {
+    color: #1E3A8A;
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 14px;
+    border-bottom: 1.5px solid #F1F5F9;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 10px;
+    font-size: 13.5px;
+    outline: none;
+    transition: all 0.2s ease;
+    background: #FFFFFF;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.form-group textarea {
+    height: 110px;
+    resize: vertical;
+}
+
+.btn-submit {
+    width: 100%;
+    background: #2563EB;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+.btn-submit:hover {
+    background: #1D4ED8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+.ticket-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
+}
+
+.ticket-card:hover {
+    border-color: #CBD5E1;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.badge-pending {
+    background: #FEF3C7;
+    color: #D97706;
+    border: 1px solid #FDE68A;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.badge-resolved {
+    background: #DCFCE7;
+    color: #15803D;
+    border: 1px solid #BBF7D0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.admin-reply-box {
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-left: 4px solid #2563EB;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-top: 14px;
+    font-size: 13.5px;
+}
+
+.alert-success {
+    background: #ECFDF5;
+    color: #065F46;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: 1px solid #A7F3D0;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 900px) {
+    .sidebar { width: 70px; padding: 20px 8px; }
+    .sidebar-brand span, .sidebar-menu span, .menu-heading { display: none; }
+    .sidebar-brand h2 { font-size: 18px; }
+    .sidebar-menu a { justify-content: center; padding: 12px; }
+    .main-content { margin-left: 70px; }
+    .navbar { padding: 16px 20px; }
+    .content-body { padding: 20px; grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR NAVIGATION -->
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <h2>👑 SRMS</h2>
+        <span>Arignar Anna College</span>
+    </div>
+    
+    <div class="sidebar-nav-container">
+        <ul class="sidebar-menu">
+            <li><a href="<?php echo $dashboard_url; ?>"><i class="fa-solid fa-house"></i> <span>Dashboard</span></a></li>
+            <?php if ($is_admin): ?>
+                <li><a href="student_records.php"><i class="fa-solid fa-user-graduate"></i> <span>Student Records</span></a></li>
+                <li><a href="bio_data.php"><i class="fa-solid fa-id-card"></i> <span>Bio Data</span></a></li>
+                <li><a href="umis.php"><i class="fa-solid fa-file-lines"></i> <span>UMIS Details</span></a></li>
+                <li><a href="result_analysis.php"><i class="fa-solid fa-chart-pie"></i> <span>Result Analysis</span></a></li>
+
+                <hr class="menu-divider">
+                <div class="menu-heading">Admin Panel</div>
+                <li><a href="manage_users.php"><i class="fa-solid fa-users-gear"></i> <span>Manage Users</span></a></li>
+                <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></a></li>
+                <li><a href="backup.php"><i class="fa-solid fa-database"></i> <span>Backup & Restore</span></a></li>
+                <li><a href="reports.php"><i class="fa-solid fa-file-lines"></i> <span>Reports</span></a></li>
+                <li><a href="support.php" class="active"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
+            <?php else: ?>
+                <li><a href="support.php" class="active"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
+            <?php endif; ?>
+        </ul>
+    </div>
+
+    <div class="sidebar-footer">
+        <ul class="sidebar-menu" style="margin-top: 0;">
+            <li><a href="<?php echo $is_admin ? 'admin_profile.php' : '../auth/login.php'; ?>"><i class="fa-solid fa-user"></i> <span>Profile</span></a></li>
+            <li><a href="../auth/logout.php" style="color: #F87171;"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="navbar">
+        <h1>Help & Support Center</h1>
+        <div class="user-profile-badge">
+            <i class="fa-solid fa-shield-halved"></i> <?php echo htmlspecialchars($role); ?>: <?php echo htmlspecialchars($user_email); ?>
+        </div>
+    </div>
+
+    <div class="content-body">
+        
+        <?php if (!$is_admin): ?>
+        <!-- STUDENT / FACULTY TICKET FORM -->
+        <div class="card">
+            <div class="card-title"><i class="fa-solid fa-headset" style="color: #2563EB;"></i> Submit Support Query</div>
+            
+            <?php if (isset($_GET['msg']) && $_GET['msg'] === 'submitted'): ?>
+                <div class="alert-success"><i class="fa-solid fa-circle-check"></i> Ticket submitted successfully!</div>
+            <?php endif; ?>
+
+            <form action="support.php" method="POST">
+                <input type="hidden" name="action" value="create_ticket">
+
+                <div class="form-group">
+                    <label>Subject / Topic</label>
+                    <input type="text" name="subject" placeholder="e.g. Login Issue / Marks Correction" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Describe Your Issue</label>
+                    <textarea name="message" placeholder="Type detailed description here..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Ticket
+                </button>
+            </form>
+        </div>
+        <?php endif; ?>
+
+        <!-- TICKETS LIST -->
+        <div class="card">
+            <div class="card-title"><i class="fa-solid fa-list-check" style="color: #2563EB;"></i> <?php echo $is_admin ? 'All Support Tickets' : 'My Support Tickets'; ?></div>
+            
+            <?php if (isset($_GET['msg']) && $_GET['msg'] === 'resolved'): ?>
+                <div class="alert-success"><i class="fa-solid fa-circle-check"></i> Ticket resolved successfully!</div>
+            <?php endif; ?>
+
+            <?php if (empty($tickets)): ?>
+                <p style="text-align: center; color: #94A3B8; padding: 40px;">No support tickets found.</p>
+            <?php else: ?>
+                <?php foreach ($tickets as $t): ?>
+                    <div class="ticket-card">
+                        <div class="ticket-header">
+                            <strong style="color: #1E3A8A; font-size: 15.5px;"><?php echo htmlspecialchars($t['subject']); ?></strong>
+                            <span class="<?php echo ($t['status'] === 'Resolved') ? 'badge-resolved' : 'badge-pending'; ?>">
+                                <?php echo htmlspecialchars($t['status']); ?>
+                            </span>
+                        </div>
+
+                        <p style="font-size: 13.5px; color: #475569; margin-bottom: 12px; line-height: 1.6;">
+                            <?php echo nl2br(htmlspecialchars($t['message'])); ?>
+                        </p>
+
+                        <div style="font-size: 12px; color: #64748B; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                            <span><i class="fa-solid fa-user-pen"></i> <?php echo htmlspecialchars($t['user_email']); ?> (<?php echo htmlspecialchars($t['user_role']); ?>)</span>
+                            <span><i class="fa-regular fa-clock"></i> <?php echo date('d M Y, h:i A', strtotime($t['created_at'])); ?></span>
+                        </div>
+
+                        <!-- Display Admin Reply if exists -->
+                        <?php if (!empty($t['admin_reply'])): ?>
+                            <div class="admin-reply-box">
+                                <strong style="color: #1E40AF;"><i class="fa-solid fa-reply"></i> Admin Response:</strong>
+                                <p style="color: #334155; margin-top: 4px;"><?php echo nl2br(htmlspecialchars($t['admin_reply'])); ?></p>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Admin Reply Form (For Admins to resolve) -->
+                        <?php if ($is_admin && $t['status'] !== 'Resolved'): ?>
+                            <form action="support.php" method="POST" style="margin-top: 15px; border-top: 1px dashed #E2E8F0; padding-top: 14px;">
+                                <input type="hidden" name="action" value="resolve_ticket">
+                                <input type="hidden" name="ticket_id" value="<?php echo $t['id']; ?>">
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <input type="text" name="admin_reply" placeholder="Type solution/reply here..." required style="padding: 9px 12px; font-size: 13px;">
+                                </div>
+                                <button type="submit" class="btn-submit" style="padding: 8px 16px; font-size: 13px; width: auto; background: #10B981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                                    <i class="fa-solid fa-check-double"></i> Reply & Resolve
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

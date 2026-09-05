@@ -1,25 +1,27 @@
 <?php
 session_start();
 
-// Generate random 4 character alphanumeric code
-$random_alpha = md5(rand());
-$captcha_code = substr($random_alpha, 0, 4);
+// Generate 5-character random string
+$captcha_code = substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 5);
+$_SESSION['captcha'] = $captcha_code;
 
-// Set session
-$_SESSION["captcha_code"] = $captcha_code;
+// Create image
+$image = imagecreatetruecolor(120, 40);
+$background = imagecolorallocate($image, 240, 240, 240);
+$text_color = imagecolorallocate($image, 30, 30, 30);
+$line_color = imagecolorallocate($image, 200, 200, 200);
 
-// Create Image
-$target_layer = imagecreatetruecolor(80, 40);
-$captcha_background = imagecolorallocate($target_layer, 255, 255, 255); // White background
-imagefill($target_layer, 0, 0, $captcha_background);
+imagefill($image, 0, 0, $background);
 
-$captcha_text_color = imagecolorallocate($target_layer, 0, 0, 0); // Black text
+// Add noise lines
+for ($i = 0; $i < 4; $i++) {
+    imageline($image, rand(0, 120), rand(0, 40), rand(0, 120), rand(0, 40), $line_color);
+}
 
-// Add text to image (Font size 5, x=20, y=12)
-imagestring($target_layer, 5, 20, 12, $captcha_code, $captcha_text_color);
+// Render string without external fonts (built-in font 5)
+imagestring($image, 5, 35, 12, $captcha_code, $text_color);
 
-// Output image
-header("Content-type: image/jpeg");
-imagejpeg($target_layer);
-imagedestroy($target_layer);
+header("Content-Type: image/png");
+imagepng($image);
+imagedestroy($image);
 ?>

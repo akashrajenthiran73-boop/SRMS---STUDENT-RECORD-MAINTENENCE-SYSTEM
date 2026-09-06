@@ -12,7 +12,7 @@ if (!isset($_SESSION['role'])) {
 $role = strtolower($_SESSION['role']);
 $display_role = $_SESSION['role'];
 
-$base_url = "/SRMS"; 
+$base_url = ""; 
 
 if ($role === 'student') {
     $dashboard_link = $base_url . "/student/dashboard_student.php";

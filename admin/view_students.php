@@ -13,7 +13,7 @@ $role = strtolower($_SESSION['role']);
 $display_role = $_SESSION['role'];
 
 // 2. Dynamic ABSOLUTE Links based on User Role (Admin / HOD)
-$base_url = "/SRMS"; 
+$base_url = ""; 
 
 if ($role === 'admin' || $role === 'super admin') {
     $dashboard_link = $base_url . "/admin/dashboard_admin.php";

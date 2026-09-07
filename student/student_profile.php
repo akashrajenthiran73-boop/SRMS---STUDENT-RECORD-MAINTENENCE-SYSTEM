@@ -88,26 +88,24 @@ if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPL
     $allowed_exts = ['jpg', 'jpeg', 'png', 'webp'];
     if (in_array($file_ext, $allowed_exts)) {
 
-        // Unique filename generating
         $user_id_filename = $_SESSION['user_id'] ?? time();
         $new_filename = "student_" . $user_id_filename . "_" . time() . "." . $file_ext;
         $bucket_name = "student_photos";
 
-        // Supabase Storage API Endpoint
-        $upload_url = $SUPABASE_URL . "/storage/v1/object/" . $bucket_name . "/" . $new_filename;
+        // Endpoint
+        $upload_url = rtrim($SUPABASE_URL, '/') . "/storage/v1/object/" . $bucket_name . "/" . $new_filename;
 
         $file_data = file_get_contents($file_tmp);
         $mime_type = mime_content_type($file_tmp);
 
-        // Upload file to Supabase Storage Bucket
         $ch = curl_init($upload_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $file_data);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "apikey: $SUPABASE_KEY",
-            "Authorization: Bearer $SUPABASE_KEY",
-            "Content-Type: $mime_type",
+            "apikey: " . $SUPABASE_KEY,
+            "Authorization: Bearer " . $SUPABASE_KEY,
+            "Content-Type: " . $mime_type,
             "x-upsert: true"
         ]);
 
@@ -116,10 +114,12 @@ if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPL
         curl_close($ch);
 
         if ($httpCode === 200 || $httpCode === 201) {
-            // Save the permanent Public URL to the Database
-            $photo_path = $SUPABASE_URL . "/storage/v1/object/public/" . $bucket_name . "/" . $new_filename;
+            $photo_path = rtrim($SUPABASE_URL, '/') . "/storage/v1/object/public/" . $bucket_name . "/" . $new_filename;
         } else {
-            echo "<script>alert('Failed to upload image to Supabase Storage.');</script>";
+            // Detailed alert for debugging
+            $err_data = json_decode($response, true);
+            $msg = $err_data['message'] ?? 'Status Code: ' . $httpCode;
+            echo "<script>alert('Supabase Upload Error: " . addslashes($msg) . "');</script>";
         }
     }
 }

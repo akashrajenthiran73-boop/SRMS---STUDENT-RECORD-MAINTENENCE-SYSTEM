@@ -90,7 +90,7 @@ if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPL
 
         $user_id_filename = $_SESSION['user_id'] ?? time();
         $new_filename = "student_" . $user_id_filename . "_" . time() . "." . $file_ext;
-        $bucket_name = "student_photos";
+        $bucket_name = "student-photos";
 
         // Endpoint
         $upload_url = rtrim($SUPABASE_URL, '/') . "/storage/v1/object/" . $bucket_name . "/" . $new_filename;

@@ -49,47 +49,49 @@ if (empty($SUPABASE_URL) || empty($SUPABASE_KEY)) {
 $bio_data = null;
 $error = "";
 
-// Fetch ONLY if BOTH Email AND Register Number match in Supabase
+// Build API Query - Priority to Reg No, fallback to Email
 if (!empty($student_reg_no)) {
     $query_param = "exam_reg_no=eq." . urlencode($student_reg_no);
 } else {
     $query_param = "email=eq." . urlencode($student_email);
 }
 
-$url = rtrim($SUPABASE_URL, '/') . "/rest/v1/students?" . $query_param . "&select=*";
+// FIX 1: Table Name changed from 'students' to 'bio_data'
+$url = rtrim($SUPABASE_URL, '/') . "/rest/v1/bio_data?" . $query_param . "&select=*";
     
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "apikey: $SUPABASE_KEY", 
-        "Authorization: Bearer $SUPABASE_KEY"
-    ]);
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    "apikey: $SUPABASE_KEY", 
+    "Authorization: Bearer $SUPABASE_KEY"
+]);
 
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curl_error = curl_error($ch);
-    curl_close($ch);
+$response = curl_exec($ch);
+$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curl_error = curl_error($ch);
+curl_close($ch);
 
-    if ($curl_error) {
-        $error = "cURL Connection Error: " . $curl_error;
-    } else if ($http_code == 200) {
-        $data = json_decode($response, true);
-        $fetched_bio = $data[0] ?? null;
+if ($curl_error) {
+    $error = "cURL Connection Error: " . $curl_error;
+} else if ($http_code == 200) {
+    $data = json_decode($response, true);
+    $fetched_bio = $data[0] ?? null;
 
-        // PHP Secondary Verification Check
-        if ($fetched_bio) {
-            $db_reg = trim($fetched_bio['exam_reg_no'] ?? $fetched_bio['reg_no'] ?? '');
-            $db_email = trim($fetched_bio['email'] ?? '');
+    // FIX 2: Flexible Verification Check (Matches Reg No OR Email)
+    if ($fetched_bio) {
+        $db_reg = trim($fetched_bio['exam_reg_no'] ?? $fetched_bio['reg_no'] ?? '');
+        $db_email = trim($fetched_bio['email'] ?? '');
 
-            if (strtolower($db_email) === strtolower($student_email) && $db_reg === $student_reg_no) {
-                $bio_data = $fetched_bio;
-            }
+        if ((!empty($student_reg_no) && $db_reg === $student_reg_no) || 
+            (!empty($student_email) && strtolower($db_email) === strtolower($student_email))) {
+            $bio_data = $fetched_bio;
         }
-    } else {
-        $error = "Database Error: HTTP $http_code - " . $response;
     }
+} else {
+    $error = "Database Error: HTTP $http_code - " . $response;
+}
 
 $user_name = $bio_data['name_ta_en'] ?? ($_SESSION['name'] ?? $_SESSION['username'] ?? 'Student');
 ?>

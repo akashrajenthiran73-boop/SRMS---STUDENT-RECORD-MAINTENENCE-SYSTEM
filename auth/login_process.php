@@ -77,7 +77,7 @@ if (isset($_POST['login'])) {
         
         // STRICT REGISTER NUMBER VALIDATION FOR STUDENT
         if (strtolower($role) === 'student') {
-            $db_reg_no = trim($user['reg_no'] ?? '');
+            $db_reg_no = trim($user['exam_reg_no'] ?? $user['reg_no'] ?? '');
             
             if (empty($reg_no) || $db_reg_no !== $reg_no) {
                 echo "<script>alert('Invalid Register Number! Please enter your correct Register Number.'); window.location='login.php';</script>";
@@ -107,7 +107,8 @@ if (isset($_POST['login'])) {
         $_SESSION['role']         = $user['role'];
         $_SESSION['name']         = $user['name'] ?? '';
         $_SESSION['email']        = $user['email'];
-        $_SESSION['reg_no']       = $user['reg_no'] ?? ''; 
+        $_SESSION['exam_reg_no']  = $user['exam_reg_no'] ?? $user['reg_no'] ?? '';
+        $_SESSION['reg_no']       = $user['exam_reg_no'] ?? $user['reg_no'] ?? '';
         $_SESSION['college_code'] = $user['college_code'] ?? '';
 
         // 3. Role-Based Redirects

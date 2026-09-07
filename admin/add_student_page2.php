@@ -24,13 +24,13 @@ if (file_exists($env_path)) {
 
 // Back button action
 if (isset($_POST['back'])) {
-    header("Location: add_student_page1.php");
+    header("Location: add_student.php");
     exit;
 }
 
 // Redirect if Page 1 session data is missing
 if (!isset($_SESSION['student_data'])) {
-    header("Location: add_student_page1.php");
+    header("Location: add_student.php");
     exit;
 }
 

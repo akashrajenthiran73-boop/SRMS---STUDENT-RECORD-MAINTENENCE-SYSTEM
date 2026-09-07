@@ -77,27 +77,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($SUPABASE_URL) && !empty($SU
         $cgpa = trim($_POST['cgpa'] ?? '');
         $prev_attendance = trim($_POST['prev_attendance'] ?? '');
 
-        // Handle File Upload for Profile Photo
-        $photo_path = isset($data['student_photo']) ? $data['student_photo'] : '';
-        if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
-            $file_tmp = $_FILES['profile_photo']['tmp_name'];
-            $file_name = $_FILES['profile_photo']['name'];
-            $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-            
-            $allowed_exts = ['jpg', 'jpeg', 'png', 'webp'];
-            if (in_array($file_ext, $allowed_exts)) {
-                $upload_dir = __DIR__ . '/uploads/';
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0755, true);
-                }
-                $new_file_name = 'student_' . $student_id . '_' . time() . '.' . $file_ext;
-                $destination = $upload_dir . $new_file_name;
-                
-                if (move_uploaded_file($file_tmp, $destination)) {
-                    $photo_path = 'uploads/' . $new_file_name;
-                }
-            }
+      // Handle File Upload for Profile Photo to Supabase Storage
+$photo_path = isset($data['student_photo']) ? $data['student_photo'] : '';
+
+if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
+    $file_tmp  = $_FILES['profile_photo']['tmp_name'];
+    $file_name = $_FILES['profile_photo']['name'];
+    $file_ext  = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+    $allowed_exts = ['jpg', 'jpeg', 'png', 'webp'];
+    if (in_array($file_ext, $allowed_exts)) {
+
+        // Unique filename generating
+        $user_id_filename = $_SESSION['user_id'] ?? time();
+        $new_filename = "student_" . $user_id_filename . "_" . time() . "." . $file_ext;
+        $bucket_name = "student_photos";
+
+        // Supabase Storage API Endpoint
+        $upload_url = $SUPABASE_URL . "/storage/v1/object/" . $bucket_name . "/" . $new_filename;
+
+        $file_data = file_get_contents($file_tmp);
+        $mime_type = mime_content_type($file_tmp);
+
+        // Upload file to Supabase Storage Bucket
+        $ch = curl_init($upload_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $file_data);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "apikey: $SUPABASE_KEY",
+            "Authorization: Bearer $SUPABASE_KEY",
+            "Content-Type: $mime_type",
+            "x-upsert: true"
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200 || $httpCode === 201) {
+            // Save the permanent Public URL to the Database
+            $photo_path = $SUPABASE_URL . "/storage/v1/object/public/" . $bucket_name . "/" . $new_filename;
+        } else {
+            echo "<script>alert('Failed to upload image to Supabase Storage.');</script>";
         }
+    }
+}
 
         $update_data = json_encode([
             'name_ta_en' => $name_ta_en,

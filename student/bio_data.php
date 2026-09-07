@@ -50,9 +50,13 @@ $bio_data = null;
 $error = "";
 
 // Fetch ONLY if BOTH Email AND Register Number match in Supabase
-if (!empty($student_email) && !empty($student_reg_no)) {
-    // Supabase API: Strict AND Condition (email AND exam_reg_no matching)
-    $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/bio_data?email=eq." . urlencode($student_email) . "&exam_reg_no=eq." . urlencode($student_reg_no) . "&select=*";
+if (!empty($student_reg_no)) {
+    $query_param = "exam_reg_no=eq." . urlencode($student_reg_no);
+} else {
+    $query_param = "email=eq." . urlencode($student_email);
+}
+
+$url = rtrim($SUPABASE_URL, '/') . "/rest/v1/students?" . $query_param . "&select=*";
     
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

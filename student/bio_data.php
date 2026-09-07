@@ -14,7 +14,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || strtolower($_SE
 $role = strtolower($_SESSION['role']);
 $display_role = $_SESSION['role'];
 $student_email = trim($_SESSION['email'] ?? '');
-$student_reg_no = trim($_SESSION['exam_reg_no'] ?? '');
+$student_reg_no = trim($_SESSION['reg_no'] ?? '');
 
 // Dynamic Role-based Links
 $base_url = ""; 

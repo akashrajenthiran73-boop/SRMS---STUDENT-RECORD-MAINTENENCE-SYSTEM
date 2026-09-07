@@ -17,7 +17,7 @@ $student_email = trim($_SESSION['email'] ?? '');
 $student_reg_no = trim($_SESSION['reg_no'] ?? '');
 
 // Dynamic Role-based Links
-$base_url = "/SRMS"; 
+$base_url = ""; 
 $dashboard_link = $base_url . "/student/dashboard_student.php";
 $records_link   = $base_url . "/student/student_record.php";
 

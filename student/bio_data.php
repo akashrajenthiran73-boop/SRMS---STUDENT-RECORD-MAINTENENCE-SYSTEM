@@ -90,7 +90,7 @@ $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/students?" . $query_param . "&selec
     } else {
         $error = "Database Error: HTTP $http_code - " . $response;
     }
-}
+
 $user_name = $bio_data['name_ta_en'] ?? ($_SESSION['name'] ?? $_SESSION['username'] ?? 'Student');
 ?>
 <!DOCTYPE html>

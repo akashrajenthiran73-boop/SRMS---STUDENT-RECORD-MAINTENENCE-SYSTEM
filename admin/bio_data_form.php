@@ -508,6 +508,10 @@ input:focus, textarea:focus, select:focus {
                 <!-- PHOTOS & BASIC DETAILS -->
                 <div class="section">
                     <h3><i class="fa-solid fa-image"></i> Photos & Basic Details</h3>
+                    <div class="grid-2">
+                        <div class="form-group"><label>Exam Register Number</label><input type="text" name="exam_reg_no" value="<?php echo htmlspecialchars($data['exam_reg_no'] ?? ''); ?>" placeholder="Enter Exam Register Number"></div>
+                        <div class="form-group"><label>Student Email</label><input type="email" name="email" value="<?php echo htmlspecialchars($data['email'] ?? ''); ?>" placeholder="Enter Student Email"></div>
+                    </div>
                     <div class="form-group"><label>Student Photo URL</label><input type="text" name="student_photo" value="<?php echo htmlspecialchars($data['student_photo']??''); ?>"></div>
                     <div class="form-group"><label>Parents Photo URL</label><input type="text" name="parents_photo" value="<?php echo htmlspecialchars($data['parents_photo']??''); ?>"></div>
                     <div class="grid-2">
@@ -567,7 +571,7 @@ input:focus, textarea:focus, select:focus {
                     <div class="form-group"><label>14. Previous Year's Attendance %</label><input type="text" name="prev_attendance" value="<?php echo htmlspecialchars($data['prev_attendance']??''); ?>"></div>
                 </div>
 
-                <!-- CONTACT & ADDRESS -->
+              <!-- CONTACT & ADDRESS -->
                 <div class="section">
                     <h3><i class="fa-solid fa-address-book"></i> Contact & Address</h3>
                     <div class="grid-2">

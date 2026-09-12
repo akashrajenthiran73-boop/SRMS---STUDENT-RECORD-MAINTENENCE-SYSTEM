@@ -116,7 +116,7 @@ class CollegePortalOperationsTest extends TestCase {
     }
 
     public function testStudentGrievanceLifecycle(): void {
-        $testStudentId = 'STU_TEST_' . rand(100, 999);
+        $testStudentId = 'STU_TEST_' . uniqid() . '_' . rand(1000, 9999);
         $ticketNo = submit_student_grievance([
             'student_id' => $testStudentId,
             'student_name' => 'Akash Unit Test',

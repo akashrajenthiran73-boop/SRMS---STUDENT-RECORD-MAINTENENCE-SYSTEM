@@ -429,6 +429,8 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
     margin-bottom: 2px;
     letter-spacing: 0.5px;
 }
+.timetable td.empty-cell { background: #F8FAFC; border: 1.5px dashed #E2E8F0; color: #94A3B8; font-weight: 500; }
+.empty-code { color: #CBD5E1; font-size: 15px; font-weight: 600; }
 
 /* Modal Edit Box */
 .modal {
@@ -651,10 +653,18 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
                             <tr>
                                 <td class="day-col"><span class="day-badge">Day <?php echo $day; ?></span></td>
                                 <?php foreach ($slots as $slot): ?>
+                                    <?php 
+                                        $sub = trim((string)($slot['sub'] ?? ''));
+                                        $isEmpty = ($sub === '' || $sub === '—' || $sub === '-');
+                                    ?>
                                     <td colspan="<?php echo $slot['span']; ?>" 
-                                        class="<?php echo ($slot['span'] > 1) ? 'lab-cell' : ''; ?> <?php echo $can_edit ? 'editable' : ''; ?>"
-                                        <?php if ($can_edit): ?> onclick="openEditModal('<?php echo $day; ?>', <?php echo $slot['hour']; ?>, '<?php echo htmlspecialchars($slot['sub'], ENT_QUOTES); ?>', <?php echo $slot['span']; ?>)" <?php endif; ?>>
-                                        <?php echo htmlspecialchars($slot['sub']); ?>
+                                        class="<?php echo ($slot['span'] > 1) ? 'lab-cell' : ''; ?> <?php echo $isEmpty ? 'empty-cell' : ''; ?> <?php echo $can_edit ? 'editable' : ''; ?>"
+                                        <?php if ($can_edit): ?> onclick="openEditModal('<?php echo $day; ?>', <?php echo $slot['hour']; ?>, '<?php echo htmlspecialchars($sub, ENT_QUOTES); ?>', <?php echo $slot['span']; ?>)" <?php endif; ?>>
+                                        <?php if ($isEmpty): ?>
+                                            <span class="empty-code">—</span>
+                                        <?php else: ?>
+                                            <?php echo htmlspecialchars($sub); ?>
+                                        <?php endif; ?>
                                     </td>
                                 <?php endforeach; ?>
                             </tr>

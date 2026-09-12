@@ -125,8 +125,12 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
 
 /* Dynamic cell styling */
 .timetable td.editable { cursor: pointer; position: relative; transition: all 0.2s; }
-.timetable td.editable:hover { background: #FEF3C7; color: #B45309; }
 .timetable td.lab-cell { background: #EFF6FF; color: #1D4ED8; font-weight: 800; border-color: #BFDBFE; }
+.timetable td.empty-cell { background: #F8FAFC; border: 1.5px dashed #CBD5E1; }
+.timetable td.empty-cell.editable:hover { background: #F0FDF4; border-color: #10B981; }
+.empty-add-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; color: #64748B; background: #FFFFFF; border: 1px dashed #CBD5E1; transition: all 0.2s; }
+.timetable td.empty-cell.editable:hover .empty-add-btn { color: #059669; background: #D1FAE5; border-color: #6EE7B7; }
+.empty-code { color: #CBD5E1; font-size: 15px; font-weight: 600; }
 
 /* Modal Edit Box */
 .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; }
@@ -349,10 +353,23 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
                             <tr>
                                 <td class="day-col">Day <?php echo $day; ?></td>
                                 <?php foreach ($slots as $slot): ?>
+                                    <?php 
+                                        $sub = trim((string)($slot['sub'] ?? ''));
+                                        $isEmpty = ($sub === '' || $sub === '—' || $sub === '-');
+                                    ?>
                                     <td colspan="<?php echo $slot['span']; ?>" 
-                                        class="<?php echo ($slot['span'] > 1) ? 'lab-cell' : ''; ?> <?php echo $can_edit ? 'editable' : ''; ?>"
-                                        <?php if ($can_edit): ?> onclick="openEditModal('<?php echo $day; ?>', <?php echo $slot['hour']; ?>, '<?php echo htmlspecialchars($slot['sub']); ?>', <?php echo $slot['span']; ?>)" <?php endif; ?>>
-                                        <?php echo htmlspecialchars($slot['sub']); ?>
+                                        class="<?php echo ($slot['span'] > 1) ? 'lab-cell' : ''; ?> <?php echo $isEmpty ? 'empty-cell' : ''; ?> <?php echo $can_edit ? 'editable' : ''; ?>"
+                                        <?php if ($can_edit): ?> onclick="openEditModal('<?php echo $day; ?>', <?php echo $slot['hour']; ?>, '<?php echo htmlspecialchars($sub, ENT_QUOTES); ?>', <?php echo $slot['span']; ?>)" <?php endif; ?>
+                                        title="<?php echo $can_edit ? ($isEmpty ? 'Click to add subject' : 'Click to edit slot') : ''; ?>">
+                                        <?php if ($isEmpty): ?>
+                                            <?php if ($can_edit): ?>
+                                                <span class="empty-add-btn"><i class="fa-solid fa-plus"></i> Add</span>
+                                            <?php else: ?>
+                                                <span class="empty-code">—</span>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <?php echo htmlspecialchars($sub); ?>
+                                        <?php endif; ?>
                                     </td>
                                 <?php endforeach; ?>
                             </tr>
@@ -369,13 +386,15 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
 <?php if ($can_edit): ?>
 <div class="modal" id="editModal">
     <div class="modal-content">
-        <h3><i class="fa-solid fa-pen-to-square" style="color:#2563EB;"></i> Edit Schedule Slot</h3>
+        <h3><i class="fa-solid fa-pen-to-square" style="color:#2563EB;"></i> <span id="modal_title">Edit Schedule Slot</span></h3>
+        <p id="modal_subtitle" style="font-size: 12px; color: #64748B; font-weight: 600; margin-top: -8px; margin-bottom: 12px;">Day I • Period 1</p>
         <form id="editForm" onsubmit="event.preventDefault(); saveSlot();">
             <input type="hidden" id="modal_day" name="day">
             <input type="hidden" id="modal_hour" name="hour">
             
             <label for="modal_subject">Subject & Staff Code</label>
-            <input type="text" id="modal_subject" name="subject" required placeholder="e.g. DBMS(GKM)">
+            <input type="text" id="modal_subject" name="subject" required placeholder="e.g. DBMS(GKM) or — to clear">
+            <small style="display:block; margin-top:4px; color:#94A3B8; font-size:11px;">Enter subject code or '—' to leave period empty.</small>
 
             <?php if ($is_hod): ?>
             <label for="modal_span">Span (Hours Count)</label>
@@ -401,11 +420,24 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
 function openEditModal(day, hour, subject, span) {
     document.getElementById('modal_day').value = day;
     document.getElementById('modal_hour').value = hour;
-    document.getElementById('modal_subject').value = subject;
+    
+    const isBlank = (!subject || subject === '—' || subject === '-');
+    document.getElementById('modal_subject').value = isBlank ? '' : subject;
+    
+    const titleEl = document.getElementById('modal_title');
+    if (titleEl) titleEl.textContent = isBlank ? 'Add Subject to Period' : 'Edit Schedule Slot';
+    
+    const subEl = document.getElementById('modal_subtitle');
+    if (subEl) subEl.textContent = 'Day ' + day + ' • Period ' + hour;
+
     if(document.getElementById('modal_span')) {
-        document.getElementById('modal_span').value = span;
+        document.getElementById('modal_span').value = span || 1;
     }
     document.getElementById('editModal').style.display = 'flex';
+    setTimeout(() => {
+        const inp = document.getElementById('modal_subject');
+        if (inp) inp.focus();
+    }, 50);
 }
 
 function closeModal() {

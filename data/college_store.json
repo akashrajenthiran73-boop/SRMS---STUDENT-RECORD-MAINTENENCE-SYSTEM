@@ -559,9 +559,102 @@
             "established": 2026,
             "is_core": false,
             "description": ""
+        },
+        {
+            "id": "dept_test_dept_541_1789222799",
+            "code": "TEST_DEPT_541",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_541@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_134_1789223009",
+            "code": "TEST_DEPT_134",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_134@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_363_1789223036",
+            "code": "TEST_DEPT_363",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_363@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
         }
     ],
     "circulars": [
+        {
+            "id": "cir_1789223036_105",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 1953",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789223009_560",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 3651",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789222799_565",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 2005",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
         {
             "id": "cir_1789219485_261",
             "ref_no": "REF-UNIT-01",
@@ -1660,9 +1753,93 @@
             "venue": "CS Computing Lab 2",
             "coordinator": "Faculty Coordinator",
             "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789222799_478",
+            "title": "Inter-Collegiate Hackathon 3029",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789223009_609",
+            "title": "Inter-Collegiate Hackathon 8908",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789223036_140",
+            "title": "Inter-Collegiate Hackathon 9700",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
         }
     ],
     "grievances": [
+        {
+            "id": "grv_1789223036_71",
+            "ticket_no": "GRV-2026-398",
+            "student_id": "STU_TEST_6aa5607cdaab7_8265",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789223009_97",
+            "ticket_no": "GRV-2026-580",
+            "student_id": "STU_TEST_483",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Pending",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "",
+            "resolved_date": ""
+        },
+        {
+            "id": "grv_1789222799_13",
+            "ticket_no": "GRV-2026-115",
+            "student_id": "STU_TEST_534",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
         {
             "id": "grv_1789219485_25",
             "ticket_no": "GRV-2026-812",
@@ -2298,7 +2475,7 @@
         "CS_UG_1": {
             "I": [
                 {
-                    "sub": "Unit Test Isolated Slot",
+                    "sub": "C-PROG(RM)",
                     "span": 1,
                     "hour": 1
                 },
@@ -2441,13 +2618,6 @@
                     "sub": "LIBRARY",
                     "span": 1,
                     "hour": 5
-                }
-            ],
-            "Monday": [
-                {
-                    "sub": "Unit Test Isolated Slot",
-                    "span": 1,
-                    "hour": 1
                 }
             ]
         },
@@ -2893,6 +3063,289 @@
                 },
                 {
                     "sub": "DM & W(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ]
+        },
+        "CS_UG_2": {
+            "I": [
+                {
+                    "sub": "JAVA(GKM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "DS(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "WEB-TECH(SD)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "STAT-I(ACA)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "TAMIL(KRM)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "II": [
+                {
+                    "sub": "DS(RM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "JAVA(GKM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "JAVA-LAB(GKM)",
+                    "span": 2,
+                    "hour": 3
+                },
+                {
+                    "sub": "STAT-I(ACA)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "III": [
+                {
+                    "sub": "WEB-TECH(SD)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "DS(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "JAVA(GKM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "ENG-COMM(ACA)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "E-COMMERCE",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "IV": [
+                {
+                    "sub": "JAVA(GKM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "DS-LAB(RM)",
+                    "span": 2,
+                    "hour": 2
+                },
+                {
+                    "sub": "WEB-TECH(SD)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "NME(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "V": [
+                {
+                    "sub": "STAT-I(ACA)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "JAVA(GKM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "DS(RM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "WEB-TECH(SD)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "E-COMMERCE",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "VI": [
+                {
+                    "sub": "WEB-LAB(SD)",
+                    "span": 2,
+                    "hour": 1
+                },
+                {
+                    "sub": "DS(RM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "JAVA(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "SEMINAR",
+                    "span": 1,
+                    "hour": 5
+                }
+            ]
+        },
+        "CS_PG_2": {
+            "I": [
+                {
+                    "sub": "ML-TECH(GKM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "DEEP-LEARN(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "CYBER-SEC(SD)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "BIG-DATA(ACA)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "PROJECT-VIVA",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "II": [
+                {
+                    "sub": "DEEP-LEARN(RM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "ML-TECH(GKM)",
+                    "span": 2,
+                    "hour": 2
+                },
+                {
+                    "sub": "AI-LAB(GKM)",
+                    "span": 2,
+                    "hour": 4
+                }
+            ],
+            "III": [
+                {
+                    "sub": "CYBER-SEC(SD)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "BIG-DATA(ACA)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "ML-TECH(GKM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "DEEP-LEARN(RM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "PROJECT-WORK",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "IV": [
+                {
+                    "sub": "BIG-DATA-LAB(ACA)",
+                    "span": 2,
+                    "hour": 1
+                },
+                {
+                    "sub": "CYBER-SEC(SD)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "PROJECT-WORK",
+                    "span": 2,
+                    "hour": 4
+                }
+            ],
+            "V": [
+                {
+                    "sub": "ML-TECH(GKM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "CYBER-SEC(SD)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "DEEP-LEARN(RM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "BIG-DATA(ACA)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "JOURNAL-CLUB",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "VI": [
+                {
+                    "sub": "DISSERTATION",
+                    "span": 3,
+                    "hour": 1
+                },
+                {
+                    "sub": "ML-TECH(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "DEEP-LEARN(RM)",
                     "span": 1,
                     "hour": 5
                 }

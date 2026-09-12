@@ -1291,7 +1291,52 @@ function get_default_class_timetable(string $deptCode, string $classCode): array
 }
 
 /**
- * Fetches timetable for a specific department and class
+ * Normalizes slots for a single day order to ensure exactly 5 hours are represented.
+ * Missing hours are padded with clickable placeholder slots ('—').
+ * Lab sessions with span > 1 are appropriately accounted for so total span is always 5.
+ */
+function normalize_timetable_day_slots(array $slots): array {
+    $byHour = [];
+    foreach ($slots as $s) {
+        $h = (int)($s['hour'] ?? 1);
+        if ($h >= 1 && $h <= 5) {
+            $sub = trim((string)($s['sub'] ?? '—'));
+            if ($sub === '' || $sub === '-') $sub = '—';
+            $byHour[$h] = [
+                'sub'  => $sub,
+                'span' => max(1, (int)($s['span'] ?? 1)),
+                'hour' => $h
+            ];
+        }
+    }
+
+    $normalized = [];
+    $h = 1;
+    while ($h <= 5) {
+        if (isset($byHour[$h])) {
+            $slot = $byHour[$h];
+            $maxPossibleSpan = 6 - $h;
+            if ($slot['span'] > $maxPossibleSpan) {
+                $slot['span'] = $maxPossibleSpan;
+            }
+            $normalized[] = $slot;
+            $h += $slot['span'];
+        } else {
+            $normalized[] = [
+                'sub'  => '—',
+                'span' => 1,
+                'hour' => $h
+            ];
+            $h += 1;
+        }
+    }
+
+    return $normalized;
+}
+
+/**
+ * Fetches timetable for a specific department and class.
+ * Guarantees a complete 5-period schedule with no missing cells or whitespace gaps.
  */
 function get_class_timetable(string $deptCode, string $classCode = 'UG_3'): array {
     global $SUPABASE_URL, $SUPABASE_KEY;
@@ -1303,9 +1348,20 @@ function get_class_timetable(string $deptCode, string $classCode = 'UG_3'): arra
     $store = read_college_store();
     $timetables = $store['timetables'] ?? [];
 
-    // Check Supabase real-time timetable table filtered by class_code
-    if ($dept === 'CS' && !empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
-        $fetch_url = rtrim($SUPABASE_URL, '/') . "/rest/v1/timetable?class_code=eq." . urlencode($class) . "&order=day_order,hour_slot";
+    $schedule = get_default_class_timetable($dept, $class);
+
+    // If local store has customized timetable for this key, overlay it
+    if (isset($timetables[$key]) && is_array($timetables[$key]) && !empty($timetables[$key])) {
+        foreach ($timetables[$key] as $d => $slots) {
+            if (isset($schedule[$d]) && is_array($slots)) {
+                $schedule[$d] = $slots;
+            }
+        }
+    }
+
+    // Check Supabase real-time timetable table for UG_3
+    if ($dept === 'CS' && $class === 'UG_3' && !empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
+        $fetch_url = rtrim($SUPABASE_URL, '/') . "/rest/v1/timetable?class_code=eq.UG_3&order=day_order,hour_slot";
         $ch = curl_init($fetch_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -1319,39 +1375,40 @@ function get_class_timetable(string $deptCode, string $classCode = 'UG_3'): arra
         curl_close($ch);
         $db_data = json_decode($db_response, true);
         if ($http >= 200 && $http < 300 && is_array($db_data) && !empty($db_data)) {
-            $db_timetable = ['I' => [], 'II' => [], 'III' => [], 'IV' => [], 'V' => [], 'VI' => []];
+            $db_by_day = [];
             foreach ($db_data as $row) {
-                $day = $row['day_order'];
-                if (isset($db_timetable[$day])) {
-                    $db_timetable[$day][] = [
-                        'sub' => $row['subject_code'],
-                        'span' => (int)($row['colspan'] ?? 1),
-                        'hour' => (int)$row['hour_slot']
-                    ];
+                $d = $row['day_order'];
+                if (!isset($db_by_day[$d])) $db_by_day[$d] = [];
+                $db_by_day[$d][] = [
+                    'sub' => $row['subject_code'],
+                    'span' => (int)($row['colspan'] ?? 1),
+                    'hour' => (int)$row['hour_slot']
+                ];
+            }
+            foreach ($db_by_day as $d => $slots) {
+                if (isset($schedule[$d]) && !empty($slots)) {
+                    $hourMap = [];
+                    foreach ($schedule[$d] as $s) {
+                        $hourMap[$s['hour']] = $s;
+                    }
+                    foreach ($slots as $s) {
+                        $hourMap[$s['hour']] = $s;
+                    }
+                    $schedule[$d] = array_values($hourMap);
                 }
             }
-            $customSchedule = get_default_class_timetable($dept, $class);
-            foreach ($db_timetable as $d => $slots) {
-                if (!empty($slots)) {
-                    $customSchedule[$d] = $slots;
-                }
-            }
-            if (!isset($store['timetables'])) $store['timetables'] = [];
-            $store['timetables'][$key] = $customSchedule;
-            write_college_store($store);
-            return $customSchedule;
         }
     }
 
-    if (isset($timetables[$key]) && is_array($timetables[$key]) && !empty($timetables[$key])) {
-        return $timetables[$key];
+    // Normalize all 6 day orders so every day has exactly 5 total periods (no broken whitespace gaps)
+    foreach (['I', 'II', 'III', 'IV', 'V', 'VI'] as $d) {
+        $schedule[$d] = normalize_timetable_day_slots($schedule[$d] ?? []);
     }
 
-    $default = get_default_class_timetable($dept, $class);
     if (!isset($store['timetables'])) $store['timetables'] = [];
-    $store['timetables'][$key] = $default;
+    $store['timetables'][$key] = $schedule;
     write_college_store($store);
-    return $default;
+    return $schedule;
 }
 
 /**
@@ -1369,11 +1426,16 @@ function save_class_timetable_slot(string $deptCode, string $classCode, string $
         $schedule[$day] = [];
     }
 
+    $sub = trim($subject);
+    if ($sub === '' || $sub === '-') {
+        $sub = '—';
+    }
+
     $found = false;
     foreach ($schedule[$day] as &$slot) {
         if ((int)$slot['hour'] === (int)$hour) {
-            $slot['sub'] = $subject;
-            $slot['span'] = (int)$span;
+            $slot['sub'] = $sub;
+            $slot['span'] = max(1, (int)$span);
             $found = true;
             break;
         }
@@ -1382,11 +1444,15 @@ function save_class_timetable_slot(string $deptCode, string $classCode, string $
 
     if (!$found) {
         $schedule[$day][] = [
-            'sub' => $subject,
-            'span' => (int)$span,
+            'sub' => $sub,
+            'span' => max(1, (int)$span),
             'hour' => (int)$hour
         ];
-        usort($schedule[$day], fn($a, $b) => $a['hour'] <=> $b['hour']);
+    }
+
+    // Normalize all 6 days so layout remains perfectly intact
+    foreach (['I', 'II', 'III', 'IV', 'V', 'VI'] as $d) {
+        $schedule[$d] = normalize_timetable_day_slots($schedule[$d] ?? []);
     }
 
     $store = read_college_store();
@@ -1396,14 +1462,15 @@ function save_class_timetable_slot(string $deptCode, string $classCode, string $
     $store['timetables'][$key] = $schedule;
     $saved = write_college_store($store);
 
-    // Synchronize to Supabase timetable table
-    if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
+    // Synchronize to Supabase timetable table for UG_3
+    // (Supabase timetable table is keyed by day_order, hour_slot)
+    if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY) && $class === 'UG_3' && $dept === 'CS') {
         $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/timetable?on_conflict=day_order,hour_slot";
         $payload = json_encode([
             'day_order'    => $day,
             'hour_slot'    => (int)$hour,
-            'subject_code' => $subject,
-            'colspan'      => (int)$span,
+            'subject_code' => $sub,
+            'colspan'      => max(1, (int)$span),
             'department'   => 'B.Sc CS',
             'class_code'   => $class,
             'updated_at'   => date('c')

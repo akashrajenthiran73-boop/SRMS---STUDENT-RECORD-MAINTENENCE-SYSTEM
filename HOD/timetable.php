@@ -442,6 +442,45 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
     letter-spacing: 0.4px;
 }
 
+/* Empty Period Cell & Add Button */
+.timetable td.empty-cell {
+    background: #F8FAFC;
+    border: 1.5px dashed #CBD5E1;
+}
+
+.timetable td.empty-cell.editable:hover {
+    background: #F0FDF4;
+    border-color: #10B981;
+}
+
+.empty-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748B;
+    background: #FFFFFF;
+    border: 1px dashed #CBD5E1;
+    transition: all 0.2s ease;
+}
+
+.timetable td.empty-cell.editable:hover .empty-add-btn {
+    color: #059669;
+    background: #D1FAE5;
+    border-color: #6EE7B7;
+    box-shadow: 0 2px 5px rgba(5, 150, 105, 0.15);
+    transform: scale(1.04);
+}
+
+.empty-code {
+    color: #CBD5E1;
+    font-size: 15px;
+    font-weight: 600;
+}
+
 /* Modal Edit Box */
 .modal {
     display: none;
@@ -723,13 +762,26 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
                                     <span class="day-badge">Day <?=htmlspecialchars($day)?></span>
                                 </td>
                                 <?php foreach ($slots as $slot): ?>
+                                    <?php 
+                                        $sub = trim((string)($slot['sub'] ?? ''));
+                                        $isEmpty = ($sub === '' || $sub === '—' || $sub === '-');
+                                    ?>
                                     <td colspan="<?php echo $slot['span']; ?>" 
-                                        class="<?php echo ($slot['span'] > 1) ? 'lab-cell' : ''; ?> <?php echo $can_edit ? 'editable' : ''; ?>"
-                                        <?php if ($can_edit): ?> onclick="openEditModal('<?php echo $day; ?>', <?php echo $slot['hour']; ?>, '<?php echo htmlspecialchars($slot['sub'], ENT_QUOTES); ?>', <?php echo $slot['span']; ?>)" <?php endif; ?>>
+                                        class="<?php echo ($slot['span'] > 1) ? 'lab-cell' : ''; ?> <?php echo $isEmpty ? 'empty-cell' : ''; ?> <?php echo $can_edit ? 'editable' : ''; ?>"
+                                        <?php if ($can_edit): ?> onclick="openEditModal('<?php echo $day; ?>', <?php echo $slot['hour']; ?>, '<?php echo htmlspecialchars($sub, ENT_QUOTES); ?>', <?php echo $slot['span']; ?>)" <?php endif; ?>
+                                        title="<?php echo $can_edit ? ($isEmpty ? 'Click to add subject' : 'Click to edit slot') : ''; ?>">
                                         <div class="slot-content">
-                                            <span class="slot-code"><?php echo htmlspecialchars($slot['sub']); ?></span>
-                                            <?php if ($slot['span'] > 1): ?>
-                                                <span class="lab-tag"><i class="fa-solid fa-flask"></i> <?php echo $slot['span']; ?> Hrs Lab</span>
+                                            <?php if ($isEmpty): ?>
+                                                <?php if ($can_edit): ?>
+                                                    <span class="empty-add-btn"><i class="fa-solid fa-plus"></i> Add</span>
+                                                <?php else: ?>
+                                                    <span class="empty-code">—</span>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <span class="slot-code"><?php echo htmlspecialchars($sub); ?></span>
+                                                <?php if ($slot['span'] > 1): ?>
+                                                    <span class="lab-tag"><i class="fa-solid fa-flask"></i> <?php echo $slot['span']; ?> Hrs Lab</span>
+                                                <?php endif; ?>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -752,7 +804,10 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             <div class="modal-header-icon">
                 <i class="fa-solid fa-pen-to-square"></i>
             </div>
-            <h3>Edit Schedule Slot</h3>
+            <div>
+                <h3 id="modal_title" style="margin:0; font-size:17px; font-weight:700;">Edit Schedule Slot</h3>
+                <span id="modal_subtitle" style="font-size:12px; color:#64748B; font-weight:600;">Day I • Period 1</span>
+            </div>
         </div>
         <form id="editForm" onsubmit="event.preventDefault(); saveSlot();">
             <input type="hidden" id="modal_day" name="day">
@@ -760,7 +815,8 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             
             <div class="form-group">
                 <label for="modal_subject">Subject & Staff Code</label>
-                <input type="text" class="form-control" id="modal_subject" name="subject" required placeholder="e.g. DBMS(GKM)">
+                <input type="text" class="form-control" id="modal_subject" name="subject" required placeholder="e.g. DBMS(GKM) or — to clear">
+                <small style="display:block; margin-top:5px; color:#94A3B8; font-size:11.5px;">Enter subject code (e.g. DBMS(GKM)) or '—' to leave period empty.</small>
             </div>
 
             <?php if ($is_hod): ?>
@@ -789,11 +845,24 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
 function openEditModal(day, hour, subject, span) {
     document.getElementById('modal_day').value = day;
     document.getElementById('modal_hour').value = hour;
-    document.getElementById('modal_subject').value = subject;
+    
+    const isBlank = (!subject || subject === '—' || subject === '-');
+    document.getElementById('modal_subject').value = isBlank ? '' : subject;
+    
+    const titleEl = document.getElementById('modal_title');
+    if (titleEl) titleEl.textContent = isBlank ? 'Add Subject to Period' : 'Edit Schedule Slot';
+    
+    const subEl = document.getElementById('modal_subtitle');
+    if (subEl) subEl.textContent = 'Day ' + day + ' • Period ' + hour;
+
     if(document.getElementById('modal_span')) {
-        document.getElementById('modal_span').value = span;
+        document.getElementById('modal_span').value = span || 1;
     }
     document.getElementById('editModal').style.display = 'flex';
+    setTimeout(() => {
+        const inp = document.getElementById('modal_subject');
+        if (inp) inp.focus();
+    }, 50);
 }
 
 function closeModal() {

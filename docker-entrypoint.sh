@@ -13,12 +13,19 @@ if [ ! -f /var/www/html/.env ]; then
     touch /var/www/html/.env
 fi
 
+DEFAULT_SUPABASE_URL="https://edwndgdjzjevbgdliuxy.supabase.co"
+DEFAULT_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkd25kZ2RqempldmJnZGxpdXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDg1ODgsImV4cCI6MjEwMDgyNDU4OH0.yvqU6cT-xbbLezB4PaXd3lufrfdzN2OwnVzOO7new_c"
+
 # If env vars provided in container runtime (e.g. Render Dashboard), inject/update .env
 if [ -n "$SUPABASE_URL" ]; then
     if grep -q "^SUPABASE_URL=" /var/www/html/.env; then
         sed -i "s|^SUPABASE_URL=.*|SUPABASE_URL=$SUPABASE_URL|" /var/www/html/.env
     else
         echo "SUPABASE_URL=$SUPABASE_URL" >> /var/www/html/.env
+    fi
+else
+    if ! grep -q "^SUPABASE_URL=" /var/www/html/.env; then
+        echo "SUPABASE_URL=$DEFAULT_SUPABASE_URL" >> /var/www/html/.env
     fi
 fi
 
@@ -27,6 +34,10 @@ if [ -n "$SUPABASE_ANON_KEY" ]; then
         sed -i "s|^SUPABASE_ANON_KEY=.*|SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY|" /var/www/html/.env
     else
         echo "SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY" >> /var/www/html/.env
+    fi
+else
+    if ! grep -q "^SUPABASE_ANON_KEY=" /var/www/html/.env; then
+        echo "SUPABASE_ANON_KEY=$DEFAULT_SUPABASE_ANON_KEY" >> /var/www/html/.env
     fi
 fi
 
@@ -55,6 +66,10 @@ chmod -R 777 /var/www/html/uploads \
              /var/www/html/data
 
 chown -R www-data:www-data /var/www/html
+
+# 4. Auto-seed essential users if users table is empty
+echo "==> Running automatic database user check..."
+php -f /var/www/html/includes/seed_users.php || true
 
 echo "==> Starting Apache web server..."
 exec apache2-foreground

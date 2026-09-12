@@ -545,9 +545,40 @@
             "established": 2026,
             "is_core": false,
             "description": ""
+        },
+        {
+            "id": "dept_test_dept_416_1789219485",
+            "code": "TEST_DEPT_416",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_416@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
         }
     ],
     "circulars": [
+        {
+            "id": "cir_1789219485_261",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 5517",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
         {
             "id": "cir_1789217124_514",
             "ref_no": "REF-UNIT-01",
@@ -1616,9 +1647,37 @@
             "venue": "CS Computing Lab 2",
             "coordinator": "Faculty Coordinator",
             "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789219485_338",
+            "title": "Inter-Collegiate Hackathon 5433",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
         }
     ],
     "grievances": [
+        {
+            "id": "grv_1789219485_25",
+            "ticket_no": "GRV-2026-812",
+            "student_id": "STU_TEST_393",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
         {
             "id": "grv_1789217124_77",
             "ticket_no": "GRV-2026-514",

@@ -1,6 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+    @session_start();
 }
 
 $env = [];
@@ -8,8 +8,12 @@ if (file_exists(__DIR__ . "/../.env")) {
     $env = @parse_ini_file(__DIR__ . "/../.env") ?: [];
 }
 
-$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? getenv('SUPABASE_URL') ?: '');
-$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? getenv('SUPABASE_ANON_KEY') ?: '');
+$DEFAULT_SUPABASE_URL = 'https://edwndgdjzjevbgdliuxy.supabase.co';
+$DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkd25kZ2RqempldmJnZGxpdXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDg1ODgsImV4cCI6MjEwMDgyNDU4OH0.yvqU6cT-xbbLezB4PaXd3lufrfdzN2OwnVzOO7new_c';
+
+$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? $DEFAULT_SUPABASE_URL));
+$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? getenv('SUPABASE_ANON_KEY') ?: ($_ENV['SUPABASE_ANON_KEY'] ?? $DEFAULT_SUPABASE_KEY));
+
 
 // Supabase ku curl anupuradhu common function
 function supabase_get($table, $query="") {

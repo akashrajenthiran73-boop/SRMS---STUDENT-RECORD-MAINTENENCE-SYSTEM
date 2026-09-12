@@ -12,20 +12,25 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
 $role = $_SESSION['role']; // 'Student', 'Faculty', 'HOD' / 'Admin' / 'Super Admin'
 $can_edit = in_array($role, ['HOD', 'Admin', 'Super Admin', 'Faculty']);
 $is_hod = in_array($role, ['HOD', 'Admin', 'Super Admin']);
+$is_admin = in_array($role, ['Admin', 'Super Admin']);
 
-// 2. Load Supabase Environment Variables
-$env_path = __DIR__ . '/../.env';
-$SUPABASE_URL = '';
-$SUPABASE_KEY = '';
+require_once __DIR__ . '/../includes/college_data.php';
 
-if (file_exists($env_path)) {
-    $env = parse_ini_file($env_path);
-    $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
-    $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
+// 2. Department and Class resolution
+$all_departments = get_all_departments();
+$session_dept = $_SESSION['department'] ?? 'CS';
+$selected_dept = $is_admin ? ($_GET['dept'] ?? $session_dept) : $session_dept;
+if (empty($selected_dept) || $selected_dept === 'BSC') $selected_dept = 'CS';
+
+$available_classes = get_department_classes($selected_dept);
+$selected_class = $_GET['class'] ?? 'UG_3';
+if (!isset($available_classes[$selected_class])) {
+    $selected_class = array_key_first($available_classes) ?: 'UG_3';
 }
+$class_info = $available_classes[$selected_class];
 
-// 3. Handle AJAX Save Request (Inline Backend API Handler)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+// 3. Handle AJAX Save Request (Multi-Class Slot Updater)
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
     header('Content-Type: application/json');
 
     if (!$can_edit) {
@@ -35,85 +40,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
 
     $input = json_decode(file_get_contents('php://input'), true);
     $day = $input['day'] ?? '';
-    $hour = $input['hour'] ?? 1;
-    $subject = $input['subject'] ?? '';
-    $span = $input['span'] ?? 1;
+    $hour = (int)($input['hour'] ?? 1);
+    $subject = trim($input['subject'] ?? '');
+    $span = (int)($input['span'] ?? 1);
+    $target_dept = trim($input['dept'] ?? $selected_dept);
+    $target_class = trim($input['class'] ?? $selected_class);
 
-    $url = $SUPABASE_URL . "/rest/v1/timetable?on_conflict=day_order,hour_slot";
-    $payload = json_encode([
-        'day_order' => $day,
-        'hour_slot' => (int)$hour,
-        'subject_code' => $subject,
-        'colspan' => (int)$span
-    ]);
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "apikey: $SUPABASE_KEY",
-        "Authorization: Bearer $SUPABASE_KEY",
-        "Content-Type: application/json",
-        "Prefer: resolution=merge-duplicates"
-    ]);
-
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($http_code == 200 || $http_code == 201) {
+    $saved = save_class_timetable_slot($target_dept, $target_class, $day, $hour, $subject, $span);
+    if ($saved) {
         echo json_encode(['success' => true]);
     } else {
-        echo json_encode(['success' => false, 'error' => $response]);
+        echo json_encode(['success' => false, 'error' => 'Failed to save timetable slot.']);
     }
     exit();
 }
 
-// 4. Default Timetable Structure (Fallback Data)
-$timetable = [
-    'I'   => [['sub' => 'SE(RM)', 'span' => 1, 'hour' => 1], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 2], ['sub' => 'OS(ACA)', 'span' => 1, 'hour' => 3], ['sub' => 'PROJ-VIVA(ACA)', 'span' => 1, 'hour' => 4], ['sub' => 'V.Edu(SD)', 'span' => 1, 'hour' => 5]],
-    'II'  => [['sub' => 'OS(ACA)', 'span' => 1, 'hour' => 1], ['sub' => 'PROJ-VIVA(ACA)', 'span' => 1, 'hour' => 2], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 3], ['sub' => 'SE(RM)', 'span' => 1, 'hour' => 4], ['sub' => 'PROJ-VIVA(RM)', 'span' => 1, 'hour' => 5]],
-    'III' => [['sub' => 'OS(ACA)', 'span' => 1, 'hour' => 1], ['sub' => 'PROJ-VIVA(SD)', 'span' => 1, 'hour' => 2], ['sub' => 'SE(RM)', 'span' => 1, 'hour' => 3], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 4], ['sub' => 'Tnskill-SALESFORCE', 'span' => 1, 'hour' => 5]],
-    'IV'  => [['sub' => 'SE(RM)', 'span' => 1, 'hour' => 1], ['sub' => 'PROJ-VIVA(RM)', 'span' => 1, 'hour' => 2], ['sub' => 'DM & W(SD)', 'span' => 1, 'hour' => 3], ['sub' => 'DBMS LAB(GKM)', 'span' => 2, 'hour' => 4]],
-    'V'   => [['sub' => 'DM & W(SD)', 'span' => 1, 'hour' => 1], ['sub' => 'SE(RM)', 'span' => 1, 'hour' => 2], ['sub' => 'Tnskill-SALESFORCE', 'span' => 1, 'hour' => 3], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 4], ['sub' => 'V.Edu(SD)', 'span' => 1, 'hour' => 5]],
-    'VI'  => [['sub' => 'DBMS LAB(GKM)', 'span' => 3, 'hour' => 1], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 4], ['sub' => 'DM & W(SD)', 'span' => 1, 'hour' => 5]]
-];
-
-// 5. Fetch Real-time Timetable Data from Supabase
-if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
-    $fetch_url = $SUPABASE_URL . "/rest/v1/timetable?select=*&order=day_order,hour_slot";
-    $ch = curl_init($fetch_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "apikey: $SUPABASE_KEY",
-        "Authorization: Bearer $SUPABASE_KEY"
-    ]);
-    $db_response = curl_exec($ch);
-    curl_close($ch);
-
-    $db_data = json_decode($db_response, true);
-
-    if (is_array($db_data) && !empty($db_data)) {
-        $db_timetable = ['I' => [], 'II' => [], 'III' => [], 'IV' => [], 'V' => [], 'VI' => []];
-        foreach ($db_data as $row) {
-            $day = $row['day_order'];
-            if (isset($db_timetable[$day])) {
-                $db_timetable[$day][] = [
-                    'sub' => $row['subject_code'],
-                    'span' => (int)$row['colspan'],
-                    'hour' => (int)$row['hour_slot']
-                ];
-            }
-        }
-        // Filter out empty days to use dynamic db data
-        foreach ($db_timetable as $d => $slots) {
-            if (!empty($slots)) {
-                $timetable[$d] = $slots;
-            }
-        }
-    }
-}
+// 4. Fetch Multi-Class Timetable Data
+$timetable = get_class_timetable($selected_dept, $selected_class);
 ?>
 <?php
 $hod_name = $_SESSION['hod_name'] ?? $_SESSION['name'] ?? $_SESSION['user_name'] ?? 'HOD Faculty';
@@ -247,6 +190,81 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
     background: #6D28D9;
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
+}
+
+/* Class & Degree Switcher Tabs */
+.class-nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.class-nav-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    overflow-x: auto;
+}
+
+.class-tab-btn {
+    padding: 8px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748B;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.class-tab-btn:hover {
+    color: #7C3AED;
+    background: #F3E8FF;
+}
+
+.class-tab-btn.active {
+    background: #7C3AED;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.dept-select-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FFFFFF;
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.dept-select-box select {
+    border: 1.5px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 6px 12px;
+    outline: none;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0F172A;
+    background: #F8FAFC;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.dept-select-box select:focus {
+    border-color: #7C3AED;
 }
 
 /* Info Banner */
@@ -554,11 +572,16 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             <li><a href="umis_form_list.php"><i class="fa-solid fa-database"></i> <span>UMIS Data</span></a></li>
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-line"></i> <span>Result Analysis</span></a></li>
 
+            <li class="nav-category">College & Dept</li>
+            <li><a href="circulars.php"><i class="fa-solid fa-bullhorn"></i> <span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> <span>Events & Calendar</span></a></li>
+            <li><a href="grievances.php"><i class="fa-solid fa-headset"></i> <span>Student Grievances</span></a></li>
+
             <li class="nav-category">Department Admin</li>
             <li><a href="leave_approvals.php"><i class="fa-solid fa-clipboard-check"></i> <span>Leave Approvals</span></a></li>
             <li><a href="timetable.php" class="active"><i class="fa-solid fa-calendar-days"></i> <span>Timetable</span></a></li>
             <li><a href="send_notice.php"><i class="fa-solid fa-paper-plane"></i> <span>Send Notice</span></a></li>
-            <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></a></li>
+            <li><a href="announcements.php"><i class="fa-solid fa-bell"></i> <span>Announcements</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -594,6 +617,38 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
     <!-- Content Body -->
     <div class="content-body">
 
+        <!-- Class & Department Selector Bar -->
+        <div class="class-nav-container">
+            <div class="class-nav-tabs">
+                <?php foreach ($available_classes as $ckey => $cdata): ?>
+                    <a href="timetable.php?dept=<?=urlencode($selected_dept)?>&class=<?=urlencode($ckey)?>" 
+                       class="class-tab-btn <?=$selected_class === $ckey ? 'active' : ''?>">
+                        <i class="fa-solid <?=$cdata['level'] === 'PG' ? 'fa-award' : 'fa-graduation-cap'?>"></i>
+                        <span><?=htmlspecialchars($cdata['short'])?> (<?=htmlspecialchars($cdata['level'])?> <?=htmlspecialchars($cdata['year'])?>)</span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+
+            <?php if ($is_admin): ?>
+            <div class="dept-select-box">
+                <i class="fa-solid fa-building-columns" style="color:#7C3AED;"></i>
+                <label style="font-size:11.5px; font-weight:700; color:#64748B; text-transform:uppercase;">Department:</label>
+                <select onchange="location.href='timetable.php?dept=' + encodeURIComponent(this.value) + '&class=<?=urlencode($selected_class)?>'">
+                    <?php foreach ($all_departments as $d): ?>
+                        <option value="<?=htmlspecialchars($d['code'])?>" <?=$selected_dept === $d['code'] ? 'selected' : ''?>>
+                            <?=htmlspecialchars($d['code'])?> - <?=htmlspecialchars($d['name'])?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php else: ?>
+            <div class="dept-select-box">
+                <i class="fa-solid fa-building-columns" style="color:#7C3AED;"></i>
+                <span style="font-size:12.5px; font-weight:700; color:#334155;">Dept: <b><?=htmlspecialchars($selected_dept)?></b></span>
+            </div>
+            <?php endif; ?>
+        </div>
+
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-header-title">
@@ -601,8 +656,8 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
                     <i class="fa-solid fa-calendar-week"></i>
                 </div>
                 <div>
-                    <h2>III B.Sc Computer Science</h2>
-                    <p>Academic Year: 2026 - 2027 &nbsp;|&nbsp; Odd Semester &nbsp;|&nbsp; Section A</p>
+                    <h2><?=htmlspecialchars($class_info['label'])?></h2>
+                    <p>Department of <?=htmlspecialchars($selected_dept)?> &nbsp;|&nbsp; <?=htmlspecialchars($class_info['sem'])?> &nbsp;|&nbsp; Academic Year: 2026 - 2027 &nbsp;|&nbsp; Section A</p>
                 </div>
             </div>
             <div class="action-btns">
@@ -610,7 +665,7 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
                     <i class="fa-solid fa-print"></i> Print / PDF
                 </button>
                 <?php if ($is_hod): ?>
-                    <button class="btn btn-approve" onclick="alert('Timetable Approved & Published Successfully!')">
+                    <button class="btn btn-approve" onclick="alert('Timetable for <?=htmlspecialchars($class_info['label'], ENT_QUOTES)?> Approved & Published Successfully!')">
                         <i class="fa-solid fa-circle-check"></i> Approve & Publish
                     </button>
                 <?php endif; ?>
@@ -744,19 +799,29 @@ function closeModal() {
     document.getElementById('editModal').style.display = 'none';
 }
 
+const currentDept = "<?=htmlspecialchars($selected_dept, ENT_QUOTES)?>";
+const currentClass = "<?=htmlspecialchars($selected_class, ENT_QUOTES)?>";
+
 function saveSlot() {
     const day = document.getElementById('modal_day').value;
     const hour = document.getElementById('modal_hour').value;
     const subject = document.getElementById('modal_subject').value;
     const span = document.getElementById('modal_span') ? document.getElementById('modal_span').value : 1;
 
-    fetch('timetable.php', {
+    fetch('timetable.php?dept=' + encodeURIComponent(currentDept) + '&class=' + encodeURIComponent(currentClass), {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify({ day: day, hour: hour, subject: subject, span: span })
+        body: JSON.stringify({ 
+            day: day, 
+            hour: hour, 
+            subject: subject, 
+            span: span,
+            dept: currentDept,
+            class: currentClass
+        })
     })
     .then(res => res.json())
     .then(data => {

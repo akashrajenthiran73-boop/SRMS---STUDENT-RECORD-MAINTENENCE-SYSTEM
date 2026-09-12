@@ -477,7 +477,7 @@ textarea {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">
@@ -559,16 +559,50 @@ textarea {
                     <div class="form-group"><label>6. Permanent Address</label><textarea name="permanent_address"></textarea></div>
 
                     <div class="grid-2">
-                        <div class="form-group"><label>7. Course</label><input type="text" name="course"></div>
-                        <div class="form-group"><label>8. Main Subject</label><input type="text" name="main_subject"></div>
+                        <div class="form-group">
+                            <label>7. Course / Department</label>
+                            <select name="course" id="course_select" required onchange="syncClassAndMajor()">
+                                <optgroup label="Arts & Commerce">
+                                    <option value="TAM">TAM - Tamil</option>
+                                    <option value="ENG">ENG - English</option>
+                                    <option value="HIST">HIST - History</option>
+                                    <option value="ECO">ECO - Economics</option>
+                                    <option value="COMM">COMM - Commerce</option>
+                                </optgroup>
+                                <optgroup label="Science & IT">
+                                    <option value="MATH">MATH - Mathematics</option>
+                                    <option value="PHY">PHY - Physics</option>
+                                    <option value="CHEM">CHEM - Chemistry</option>
+                                    <option value="BOT">BOT - Botany</option>
+                                    <option value="ZOO">ZOO - Zoology</option>
+                                    <option value="STAT">STAT - Statistics</option>
+                                    <option value="CS" selected>CS - Computer Science</option>
+                                    <option value="BCA">BCA - Computer Applications</option>
+                                    <option value="IT">IT - Information Technology</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>8. Degree Level & Academic Year</label>
+                            <select name="academic_year_level" id="year_level_select" onchange="syncClassAndMajor()">
+                                <option value="UG_1">UG - 1st Year (I Year)</option>
+                                <option value="UG_2">UG - 2nd Year (II Year)</option>
+                                <option value="UG_3" selected>UG - 3rd Year (III Year)</option>
+                                <option value="PG_1">PG - 1st Year (I Year PG)</option>
+                                <option value="PG_2">PG - 2nd Year (II Year PG)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="grid-2">
-                        <div class="form-group"><label>9. Medium</label><input type="text" name="medium"></div>
-                        <div class="form-group"><label>10. Ancillary Subjects</label><input type="text" name="ancillary_subjects"></div>
+                        <div class="form-group"><label>9. Main Subject / Major Degree Title</label><input type="text" name="main_subject" id="main_subject_input" value="III B.Sc Computer Science" required></div>
+                        <div class="form-group"><label>10. Medium of Instruction</label><input type="text" name="medium" value="English"></div>
                     </div>
 
-                    <div class="form-group"><label>11. Examination Register Number</label><input type="text" name="exam_reg_no"></div>
+                    <div class="grid-2">
+                        <div class="form-group"><label>11. Ancillary Subjects</label><input type="text" name="ancillary_subjects" placeholder="e.g. Mathematics, Physics"></div>
+                        <div class="form-group"><label>12. Examination Register Number</label><input type="text" name="exam_reg_no"></div>
+                    </div>
                 </div>
 
                 <!-- SEMESTER 1 -->
@@ -719,6 +753,48 @@ function calculateMarks(input) {
             pfInput.className = 'pf-fail';
         }
     }
+}
+
+function syncClassAndMajor() {
+    const course = document.getElementById('course_select').value;
+    const ylevel = document.getElementById('year_level_select').value;
+    const deptNames = {
+        'TAM': 'Tamil',
+        'ENG': 'English',
+        'HIST': 'History',
+        'ECO': 'Economics',
+        'COMM': 'Commerce',
+        'MATH': 'Mathematics',
+        'PHY': 'Physics',
+        'CHEM': 'Chemistry',
+        'BOT': 'Botany',
+        'ZOO': 'Zoology',
+        'STAT': 'Statistics',
+        'CS': 'Computer Science',
+        'BCA': 'Computer Applications',
+        'IT': 'Information Technology'
+    };
+    const deptName = deptNames[course] || course;
+    const isArts = ['TAM', 'ENG', 'HIST', 'ECO'].includes(course);
+
+    let degreePrefix = 'B.Sc';
+    if (course === 'COMM') degreePrefix = 'B.Com';
+    else if (course === 'BCA') degreePrefix = 'BCA';
+    else if (isArts) degreePrefix = 'B.A';
+
+    let yearNum = 'III';
+    if (ylevel === 'UG_1') yearNum = 'I';
+    else if (ylevel === 'UG_2') yearNum = 'II';
+    else if (ylevel === 'UG_3') yearNum = 'III';
+    else if (ylevel === 'PG_1') {
+        yearNum = 'I';
+        degreePrefix = (course === 'COMM') ? 'M.Com' : (isArts ? 'M.A' : 'M.Sc');
+    } else if (ylevel === 'PG_2') {
+        yearNum = 'II';
+        degreePrefix = (course === 'COMM') ? 'M.Com' : (isArts ? 'M.A' : 'M.Sc');
+    }
+
+    document.getElementById('main_subject_input').value = yearNum + ' ' + degreePrefix + ' ' + deptName;
 }
 
 // Load default 3 rows per semester on page load

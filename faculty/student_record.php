@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 
 // Faculty Role Check
 if(!isset($_SESSION['role']) || $_SESSION['role'] != 'Faculty'){
-    header("Location: login.php"); 
+    header("Location: ../auth/login.php"); 
     exit;
 }
 
@@ -65,6 +65,30 @@ foreach($students as &$s){
     }
 }
 unset($s);
+
+require_once __DIR__ . '/../includes/college_data.php';
+
+$session_dept = $_SESSION['department'] ?? 'CS';
+if (empty($session_dept) || $session_dept === 'BSC') $session_dept = 'CS';
+
+$selected_year = $_GET['year'] ?? 'All';
+
+// 1. Filter by Faculty Department
+$students = array_filter($students, function($s) use ($session_dept) {
+    $c = strtoupper($s['course'] ?? '');
+    if ($session_dept === 'CS') {
+        return (strpos($c, 'CS') !== false || strpos($c, 'COMPUTER') !== false || strpos($c, 'B.SC') !== false || empty($c));
+    }
+    return (strpos($c, strtoupper($session_dept)) !== false);
+});
+
+// 2. Filter by Academic Year / Degree Level
+if ($selected_year !== 'All' && !empty($students)) {
+    $students = array_filter($students, function($s) use ($selected_year) {
+        $info = get_student_year_info($s);
+        return ($info['filter_tag'] === $selected_year || $info['level'] === $selected_year);
+    });
+}
 
 $faculty_name = $_SESSION['name'] ?? 'Faculty';
 ?>
@@ -401,6 +425,10 @@ tr:hover td { background: #F8FAFC; }
             <li><a href="umis_data.php"><i class="fa-solid fa-clipboard-user"></i><span>UMIS Data</span></a></li>
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-pie"></i><span>Result Analysis</span></a></li>
 
+            <div class="menu-category">College & Dept</div>
+            <li><a href="circulars.php"><i class="fa-solid fa-bullhorn"></i><span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i><span>Events & Calendar</span></a></li>
+
             <div class="menu-category">Faculty Panel</div>
             <li><a href="student_leave_requests.php"><i class="fa-solid fa-user-check"></i><span>Student Leave Requests</span></a></li>
             <li><a href="leave_faculty.php"><i class="fa-solid fa-file-pen"></i><span>Apply Leave</span></a></li>
@@ -409,7 +437,7 @@ tr:hover td { background: #F8FAFC; }
             <li><a href="syllabus_materials.php"><i class="fa-solid fa-book-open-reader"></i><span>Syllabus & Materials</span></a></li>
             <li><a href="assignments.php"><i class="fa-solid fa-file-pen"></i><span>Assignments</span></a></li>
             <li><a href="timetable.php"><i class="fa-solid fa-calendar-days"></i><span>Timetable</span></a></li>
-            <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i><span>Announcements</span></a></li>
+            <li><a href="announcements.php"><i class="fa-solid fa-bell"></i><span>Announcements</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i><span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -427,6 +455,9 @@ tr:hover td { background: #F8FAFC; }
     <div class="topbar">
         <h2><i class="fa-solid fa-users-rectangle"></i> Student Records Management</h2>
         <div class="topbar-right">
+            <span style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1D4ED8; font-size: 11.5px; font-weight: 700; padding: 5px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-laptop-code"></i> Department of Computer Science
+            </span>
             <div class="role-badge"><i class="fa-solid fa-shield-halved"></i> Role: Faculty</div>
         </div>
     </div>
@@ -435,11 +466,23 @@ tr:hover td { background: #F8FAFC; }
         <div class="page-header">
             <div>
                 <h1><i class="fa-solid fa-user-graduate" style="color:#2563EB;"></i> Assigned Student Directory</h1>
-                <p style="color: #64748B; font-size: 13.5px; margin-top: 4px;">Total Students: <b><?=count($students)?></b></p>
+                <p style="color: #64748B; font-size: 13.5px; margin-top: 4px;">Department: <b><?=htmlspecialchars($session_dept)?></b> &nbsp;|&nbsp; Total Filtered Students: <b><?=count($students)?></b></p>
             </div>
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search students...">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <form method="GET" style="display:inline-flex; align-items:center; gap:6px;">
+                    <select name="year" onchange="this.form.submit()" style="padding: 9px 14px; border: 1.5px solid #CBD5E1; border-radius: 9px; font-size: 13px; font-weight: 700; outline: none; background: #FFFFFF; color: #0F172A; cursor: pointer;">
+                        <option value="All" <?=$selected_year === 'All' ? 'selected' : ''?>>All Classes & Years</option>
+                        <option value="UG_1" <?=$selected_year === 'UG_1' ? 'selected' : ''?>>UG - 1st Year (I Year)</option>
+                        <option value="UG_2" <?=$selected_year === 'UG_2' ? 'selected' : ''?>>UG - 2nd Year (II Year)</option>
+                        <option value="UG_3" <?=$selected_year === 'UG_3' ? 'selected' : ''?>>UG - 3rd Year (III Year)</option>
+                        <option value="PG_1" <?=$selected_year === 'PG_1' ? 'selected' : ''?>>PG - 1st Year (I M.Sc)</option>
+                        <option value="PG_2" <?=$selected_year === 'PG_2' ? 'selected' : ''?>>PG - 2nd Year (II M.Sc)</option>
+                    </select>
+                </form>
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search students...">
+                </div>
             </div>
         </div>
 
@@ -452,6 +495,7 @@ tr:hover td { background: #F8FAFC; }
                             <th>Admission No</th>
                             <th>Name</th>
                             <th>Course</th>
+                            <th>Academic Class</th>
                             <th>Roll / Reg No</th>
                             <th>Parent Contact</th>
                             <th style="text-align: right;">Actions</th>
@@ -460,6 +504,7 @@ tr:hover td { background: #F8FAFC; }
                     <tbody>
                     <?php if(count($students) > 0): $i = 1; foreach($students as $s): 
                         $bio = $s['bio'] ?? []; 
+                        $yinfo = get_student_year_info($s);
                         $admission_no = htmlspecialchars($s['admission_no'] ?? '-'); 
                         $name = htmlspecialchars($s['name'] ?? '-');
                         $course = htmlspecialchars($bio['course'] ?? $s['course'] ?? '-');
@@ -471,6 +516,11 @@ tr:hover td { background: #F8FAFC; }
                         <td><span class="badge-tag"><b><?=$admission_no?></b></span></td>
                         <td style="font-weight: 700; color: #0F172A;"><?=$name?></td>
                         <td><?=$course?></td>
+                        <td>
+                            <span style="background: #EFF6FF; color: #1D4ED8; font-weight: 700; font-size: 11.5px; padding: 4px 10px; border-radius: 6px; border: 1px solid #BFDBFE; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fa-solid <?=$yinfo['level'] === 'PG' ? 'fa-award' : 'fa-graduation-cap'?>"></i> <?=htmlspecialchars($yinfo['short'])?>
+                            </span>
+                        </td>
                         <td><?=$roll_no?></td>
                         <td>
                             <?php if(!empty($parent_phone)): ?>
@@ -494,7 +544,7 @@ tr:hover td { background: #F8FAFC; }
                         </td>
                     </tr>
                     <?php endforeach; else: ?>
-                    <tr><td colspan="7" style="text-align:center; padding:50px 20px; color:#64748B;">No Students Found</td></tr>
+                    <tr><td colspan="8" style="text-align:center; padding:50px 20px; color:#64748B;">No Students Found Matching Selected Criteria</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>

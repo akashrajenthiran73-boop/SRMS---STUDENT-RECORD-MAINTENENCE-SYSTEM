@@ -5,7 +5,7 @@ error_reporting(E_ALL);
 
 // Faculty Role Check
 if(!isset($_SESSION['role']) || $_SESSION['role'] != 'Faculty'){
-    header("Location: login.php"); 
+    header("Location: ../auth/login.php"); 
     exit;
 }
 
@@ -31,6 +31,7 @@ $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
 $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
 
 $faculty_name = $_SESSION['name'] ?? 'Faculty';
+$faculty_dept = $_SESSION['department'] ?? 'Computer Science';
 $faculty_id = $_SESSION['user_id'] ?? ($_SESSION['id'] ?? '');
 
 // Fetch dynamic counts if Supabase is connected
@@ -369,6 +370,10 @@ body {
             <li><a href="umis_data.php"><i class="fa-solid fa-clipboard-user"></i><span>UMIS Data</span></a></li>
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-pie"></i><span>Result Analysis</span></a></li>
 
+            <div class="menu-category">College & Dept</div>
+            <li><a href="circulars.php"><i class="fa-solid fa-bullhorn"></i><span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i><span>Events & Calendar</span></a></li>
+
             <div class="menu-category">Faculty Panel</div>
             <li><a href="student_leave_requests.php"><i class="fa-solid fa-user-check"></i><span>Student Leave Requests</span></a></li>
             <li><a href="leave_faculty.php"><i class="fa-solid fa-file-pen"></i><span>Apply Leave</span></a></li>
@@ -377,7 +382,7 @@ body {
             <li><a href="syllabus_materials.php"><i class="fa-solid fa-book-open-reader"></i><span>Syllabus & Materials</span></a></li>
             <li><a href="assignments.php"><i class="fa-solid fa-file-pen"></i><span>Assignments</span></a></li>
             <li><a href="timetable.php"><i class="fa-solid fa-calendar-days"></i><span>Timetable</span></a></li>
-            <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i><span>Announcements</span></a></li>
+            <li><a href="announcements.php"><i class="fa-solid fa-bell"></i><span>Announcements</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i><span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -395,6 +400,9 @@ body {
     <div class="topbar">
         <h2><i class="fa-solid fa-chalkboard-user"></i> Faculty Portal</h2>
         <div class="topbar-right">
+            <span style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1D4ED8; font-size: 11.5px; font-weight: 700; padding: 5px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-laptop-code"></i> Department of <?=htmlspecialchars($faculty_dept)?>
+            </span>
             <div class="role-badge"><i class="fa-solid fa-shield-halved"></i> Role: Faculty</div>
         </div>
     </div>
@@ -402,8 +410,11 @@ body {
     <div class="content-body">
         <div class="welcome-banner">
             <div>
+                <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.15); padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; margin-bottom:8px; border:1px solid rgba(255,255,255,0.2);">
+                    <i class="fa-solid fa-building-columns"></i> <?=htmlspecialchars($faculty_dept)?> Department
+                </div>
                 <h1>Welcome back, <?=htmlspecialchars($faculty_name)?>!</h1>
-                <p>Arignar Anna College Student Record Maintenance System</p>
+                <p>Arignar Anna Government Arts College Student Record Maintenance System</p>
             </div>
             <div class="welcome-badge">
                 <i class="fa-regular fa-calendar-check"></i> Academic Session Active
@@ -449,6 +460,33 @@ body {
                         <div class="card-icon"><i class="fa-solid fa-chart-pie"></i></div>
                     </div>
                     <div class="card-value"><?=htmlspecialchars($result_analysis)?> <i class="fa-solid fa-arrow-right" style="font-size: 16px;"></i></div>
+                </div>
+            </a>
+        </div>
+
+        <!-- College Operations Quick Cards -->
+        <div style="font-size: 15px; font-weight: 700; color: #0F172A; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-building-columns" style="color:#2563EB;"></i> College Operations & Communications
+        </div>
+
+        <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+            <a href="circulars.php">
+                <div class="stat-card blue" style="background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);">
+                    <div class="card-top">
+                        <span class="card-title">Circulars & Notices</span>
+                        <div class="card-icon"><i class="fa-solid fa-bullhorn"></i></div>
+                    </div>
+                    <div class="card-value">Official Circulars <i class="fa-solid fa-arrow-right" style="font-size: 16px;"></i></div>
+                </div>
+            </a>
+
+            <a href="events.php">
+                <div class="stat-card purple" style="background: linear-gradient(135deg, #4C1D95 0%, #7C3AED 100%);">
+                    <div class="card-top">
+                        <span class="card-title">Events & Calendar</span>
+                        <div class="card-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                    </div>
+                    <div class="card-value">View Schedule <i class="fa-solid fa-arrow-right" style="font-size: 16px;"></i></div>
                 </div>
             </a>
         </div>

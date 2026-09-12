@@ -1,0 +1,11 @@
+.git
+.gitignore
+.phpunit.cache
+phpunit.phar
+phpunit.xml
+tests/
+scratch/
+*.md
+run-tests.bat
+.env
+.env.*

@@ -1,17 +1,20 @@
 <?php 
 session_start(); 
 if(!isset($_SESSION['user_id'])){ 
-    header("Location: login.php"); 
+    header("Location: ../auth/login.php"); 
     exit(); 
 } 
 $role = 'Admin'; 
 
 // Database Connection Integration
 // include('../db.php'); 
+require_once __DIR__ . '/../includes/college_data.php';
 
 $total_students = 1240; 
 $umis_fields_count = "";
 $result_analysis = "View";
+$metrics = get_college_metrics();
+$departments = get_all_departments();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -307,7 +310,7 @@ body {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna Govt Arts College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <!-- SCROLLABLE MENU CONTAINER -->
@@ -319,13 +322,21 @@ body {
             <li><a href="umis.php"><i class="fa-solid fa-file-lines"></i> <span>UMIS Details</span></a></li>
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-pie"></i> <span>Result Analysis</span></a></li>
 
+            <!-- COLLEGE LEVEL OPERATIONS -->
+            <hr class="menu-divider">
+            <div class="menu-heading">College Operations</div>
+            <li><a href="manage_departments.php"><i class="fa-solid fa-building-columns"></i> <span>Manage Departments</span></a></li>
+            <li><a href="circulars.php"><i class="fa-solid fa-envelope-open-text"></i> <span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> <span>Academic Events</span></a></li>
+            <li><a href="grievances.php"><i class="fa-solid fa-comments"></i> <span>Student Grievances</span></a></li>
+
             <!-- ADMIN EXCLUSIVE MENUS -->
             <hr class="menu-divider">
             <div class="menu-heading">Admin Panel</div>
             <li><a href="manage_users.php"><i class="fa-solid fa-users-gear"></i> <span>Manage Users</span></a></li>
             <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></a></li>
             <li><a href="backup.php"><i class="fa-solid fa-database"></i> <span>Backup & Restore</span></a></li>
-            <li><a href="reports.php"><i class="fa-solid fa-file-lines"></i> <span>Reports</span></a></li>
+            <li><a href="reports.php"><i class="fa-solid fa-chart-line"></i> <span>Reports</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -351,7 +362,24 @@ body {
 
     <div class="content-body">
         
-        <div class="section-title"><i class="fa-solid fa-gauge-high"></i> Overview Metrics</div>
+        <!-- COLLEGE & DEPARTMENT ACTIVE BADGE STRIP -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px 24px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: #EFF6FF; color: #2563EB; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                    <i class="fa-solid fa-building-columns"></i>
+                </div>
+                <div>
+                    <h4 style="font-size: 15px; font-weight: 800; color: #0F172A;">Arignar Anna Government Arts College, Villupuram</h4>
+                    <span style="font-size: 12px; color: #64748B;">Active Core Department: <strong style="color: #2563EB;">B.Sc Computer Science</strong> &bull; <?php echo count($departments); ?> Academic Departments Configured</span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <a href="manage_departments.php" class="btn btn-light" style="padding: 8px 14px; font-size: 12.5px;"><i class="fa-solid fa-sitemap"></i> View Departments</a>
+                <a href="circulars.php" class="btn btn-primary" style="padding: 8px 14px; font-size: 12.5px;"><i class="fa-solid fa-bullhorn"></i> New Circular</a>
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fa-solid fa-gauge-high"></i> Student & Academic Records (B.Sc CS Core)</div>
 
         <!-- DASHBOARD STATS CARDS WITH FULL GRADIENTS -->
         <div class="card-container">
@@ -377,6 +405,34 @@ body {
             <div class="card-icon"><i class="fa-solid fa-chart-pie"></i></div>
             <h3>Result Analysis</h3>
             <p><?php echo $result_analysis; ?></p>
+          </div>
+        </div>
+
+        <div class="section-title"><i class="fa-solid fa-landmark"></i> College Operations & Administration</div>
+
+        <div class="card-container">
+          <div class="card c-purple" onclick="location.href='manage_departments.php'">
+            <div class="card-icon"><i class="fa-solid fa-building-columns"></i></div>
+            <h3>Departments Directory</h3>
+            <p><?php echo $metrics['total_departments']; ?> <span style="font-size: 14px; font-weight: 600; opacity: 0.9;">Departments</span></p>
+          </div>
+          
+          <div class="card c-blue" onclick="location.href='circulars.php'">
+            <div class="card-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+            <h3>College Circulars</h3>
+            <p><?php echo $metrics['total_circulars']; ?> <span style="font-size: 14px; font-weight: 600; opacity: 0.9;">Active Notices</span></p>
+          </div>
+          
+          <div class="card c-amber" onclick="location.href='events.php'">
+            <div class="card-icon"><i class="fa-solid fa-calendar-check"></i></div>
+            <h3>Academic Calendar</h3>
+            <p><?php echo $metrics['upcoming_events']; ?> <span style="font-size: 14px; font-weight: 600; opacity: 0.9;">Events Scheduled</span></p>
+          </div>
+          
+          <div class="card c-emerald" onclick="location.href='grievances.php'">
+            <div class="card-icon"><i class="fa-solid fa-comments"></i></div>
+            <h3>Student Grievances</h3>
+            <p><?php echo $metrics['pending_grievances']; ?> <span style="font-size: 14px; font-weight: 600; opacity: 0.9;">Pending Review</span></p>
           </div>
         </div>
 

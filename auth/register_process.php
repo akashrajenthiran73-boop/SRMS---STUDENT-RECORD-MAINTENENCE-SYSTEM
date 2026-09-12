@@ -26,12 +26,13 @@ $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
 $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
 
 if (isset($_POST['register'])) {
-    $name     = trim($_POST['name']);
-    $email    = trim($_POST['email']);
-    $role     = trim($_POST['role']);
-    $password = $_POST['password'];
+    $name       = trim($_POST['name']);
+    $email      = trim($_POST['email']);
+    $role       = trim($_POST['role']);
+    $department = trim($_POST['department'] ?? 'Computer Science');
+    $password   = $_POST['password'];
     // Register Number capturing from Form
-    $reg_no   = trim($_POST['reg_no'] ?? '');
+    $reg_no     = trim($_POST['reg_no'] ?? '');
 
     // Hash password for security
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
@@ -57,15 +58,16 @@ if (isset($_POST['register'])) {
         exit;
     }
 
-    // 2. Insert new user with 'reg_no' into Supabase Database
+    // 2. Insert new user with 'reg_no' and 'department' into Supabase Database
     $insert_url = $SUPABASE_URL . "/rest/v1/users";
     
     $data = array(
-        "name"     => $name,
-        "email"    => $email,
-        "role"     => $role,
-        "password" => $hashed_password,
-        "reg_no"   => $reg_no // Storing Register Number in DB
+        "name"       => $name,
+        "email"      => $email,
+        "role"       => $role,
+        "department" => $department,
+        "password"   => $hashed_password,
+        "reg_no"     => $reg_no // Storing Register Number in DB
     );
 
     $payload = json_encode($data);

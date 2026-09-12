@@ -107,6 +107,7 @@ if (isset($_POST['login'])) {
         $_SESSION['role']         = $user['role'];
         $_SESSION['name']         = $user['name'] ?? '';
         $_SESSION['email']        = $user['email'];
+        $_SESSION['department']   = !empty($user['department']) ? $user['department'] : 'Computer Science';
         $_SESSION['exam_reg_no']  = $user['exam_reg_no'] ?? $user['reg_no'] ?? '';
         $_SESSION['reg_no']       = $user['exam_reg_no'] ?? $user['reg_no'] ?? '';
         $_SESSION['college_code'] = $user['college_code'] ?? '';

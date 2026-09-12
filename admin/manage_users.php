@@ -78,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim($_POST['email'] ?? '');
         $password = password_hash(trim($_POST['password'] ?? ''), PASSWORD_BCRYPT);
         $role = trim($_POST['role'] ?? '');
+        $department = trim($_POST['department'] ?? 'Computer Science');
         $status = 'Active';
 
         if ($name && $email && $role) {
@@ -86,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'email' => $email,
                 'password' => $password,
                 'role' => $role,
+                'department' => $department,
                 'status' => $status
             ];
             list($res, $http) = callSupabase(rtrim($SUPABASE_URL, '/') . "/rest/v1/users", $SUPABASE_KEY, 'POST', $payload);
@@ -103,12 +105,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = trim($_POST['name'] ?? '');
         $email = trim($_POST['email'] ?? '');
         $role = trim($_POST['role'] ?? '');
+        $department = trim($_POST['department'] ?? 'Computer Science');
 
         if ($id && $name && $email && $role) {
             $payload = [
                 'name' => $name,
                 'email' => $email,
-                'role' => $role
+                'role' => $role,
+                'department' => $department
             ];
             list($res, $http) = callSupabase(rtrim($SUPABASE_URL, '/') . "/rest/v1/users?id=eq.$id", $SUPABASE_KEY, 'PATCH', $payload);
             if ($http >= 200 && $http < 300) {
@@ -681,7 +685,7 @@ table.user-tbl tr:hover td {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">
@@ -693,11 +697,18 @@ table.user-tbl tr:hover td {
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-pie"></i> <span>Result Analysis</span></a></li>
 
             <hr class="menu-divider">
+            <div class="menu-heading">College Operations</div>
+            <li><a href="manage_departments.php"><i class="fa-solid fa-building-columns"></i> <span>Manage Departments</span></a></li>
+            <li><a href="circulars.php"><i class="fa-solid fa-envelope-open-text"></i> <span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> <span>Academic Events</span></a></li>
+            <li><a href="grievances.php"><i class="fa-solid fa-comments"></i> <span>Student Grievances</span></a></li>
+
+            <hr class="menu-divider">
             <div class="menu-heading">Admin Panel</div>
             <li><a href="manage_users.php" class="active"><i class="fa-solid fa-users-gear"></i> <span>Manage Users</span></a></li>
             <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></a></li>
             <li><a href="backup.php"><i class="fa-solid fa-database"></i> <span>Backup & Restore</span></a></li>
-            <li><a href="reports.php"><i class="fa-solid fa-file-lines"></i> <span>Reports</span></a></li>
+            <li><a href="reports.php"><i class="fa-solid fa-chart-line"></i> <span>Reports</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -763,6 +774,7 @@ table.user-tbl tr:hover td {
                             <th>Name</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>Department</th>
                             <th>Status</th>
                             <th style="text-align: right; padding-right: 24px;">Actions</th>
                         </tr>
@@ -772,16 +784,18 @@ table.user-tbl tr:hover td {
                             $i = 1;
                             foreach($users as $u): 
                                 $role_lower = strtolower($u['role'] ?? '');
+                                $u_dept = !empty($u['department']) ? $u['department'] : 'Computer Science';
                         ?>
                         <tr>
                             <td><?=$i++?></td>
                             <td><b><?=htmlspecialchars($u['name'] ?? '-')?></b></td>
                             <td><?=htmlspecialchars($u['email'] ?? '-')?></td>
                             <td><span class="badge badge-<?=$role_lower?>"><?=htmlspecialchars($u['role'] ?? '-')?></span></td>
+                            <td><span style="background:#F1F5F9; border:1px solid #CBD5E1; color:#334155; font-size:11.5px; font-weight:700; padding:4px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><i class="fa-solid fa-building-columns" style="color:#2563EB;"></i> <?=htmlspecialchars($u_dept)?></span></td>
                             <td><span class="badge badge-active"><?=htmlspecialchars($u['status'] ?? 'Active')?></span></td>
                             <td style="text-align: right; padding-right: 20px;">
                                 <div style="display: inline-flex; gap: 6px; align-items: center;">
-                                    <button onclick="openEditModal('<?=$u['id']?>', '<?=htmlspecialchars($u['name'], ENT_QUOTES)?>', '<?=htmlspecialchars($u['email'], ENT_QUOTES)?>', '<?=$u['role']?>')" class="btn-edit" title="Edit User"><i class="fa-solid fa-pen"></i></button>
+                                    <button onclick="openEditModal('<?=$u['id']?>', '<?=htmlspecialchars($u['name'], ENT_QUOTES)?>', '<?=htmlspecialchars($u['email'], ENT_QUOTES)?>', '<?=$u['role']?>', '<?=htmlspecialchars($u_dept, ENT_QUOTES)?>')" class="btn-edit" title="Edit User"><i class="fa-solid fa-pen"></i></button>
                                     <button onclick="openPasswordModal('<?=$u['id']?>')" class="btn-pass" title="Reset Password"><i class="fa-solid fa-key"></i></button>
                                     <form method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
                                         <input type="hidden" name="action" value="delete">
@@ -795,7 +809,7 @@ table.user-tbl tr:hover td {
                             endforeach; 
                         else: 
                         ?>
-                        <tr><td colspan="6" style="text-align:center; padding:30px; color:#64748B;">No users found.</td></tr>
+                        <tr><td colspan="7" style="text-align:center; padding:30px; color:#64748B;">No users found.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -837,6 +851,29 @@ table.user-tbl tr:hover td {
                     <option value="Student">Student</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label>College Department</label>
+                <select name="department" required>
+                    <optgroup label="Arts & Commerce">
+                        <option value="Tamil">Tamil</option>
+                        <option value="English">English</option>
+                        <option value="History">History</option>
+                        <option value="Economics">Economics</option>
+                        <option value="Commerce">Commerce</option>
+                    </optgroup>
+                    <optgroup label="Science & IT">
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Botany">Botany</option>
+                        <option value="Zoology">Zoology</option>
+                        <option value="Statistics">Statistics</option>
+                        <option value="Computer Science" selected>Computer Science</option>
+                        <option value="Computer Applications">Computer Applications (BCA)</option>
+                        <option value="Information Technology">Information Technology</option>
+                    </optgroup>
+                </select>
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-back" onclick="closeModal('addModal')">Cancel</button>
                 <button type="submit" class="btn btn-add">Save User</button>
@@ -870,6 +907,29 @@ table.user-tbl tr:hover td {
                     <option value="HOD">HOD</option>
                     <option value="Faculty">Faculty</option>
                     <option value="Student">Student</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>College Department</label>
+                <select name="department" id="edit_department" required>
+                    <optgroup label="Arts & Commerce">
+                        <option value="Tamil">Tamil</option>
+                        <option value="English">English</option>
+                        <option value="History">History</option>
+                        <option value="Economics">Economics</option>
+                        <option value="Commerce">Commerce</option>
+                    </optgroup>
+                    <optgroup label="Science & IT">
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Botany">Botany</option>
+                        <option value="Zoology">Zoology</option>
+                        <option value="Statistics">Statistics</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Computer Applications">Computer Applications (BCA)</option>
+                        <option value="Information Technology">Information Technology</option>
+                    </optgroup>
                 </select>
             </div>
             <div class="modal-footer">
@@ -909,11 +969,14 @@ function openModal(id) {
 function closeModal(id) {
     document.getElementById(id).style.display = 'none';
 }
-function openEditModal(id, name, email, role) {
+function openEditModal(id, name, email, role, department) {
     document.getElementById('edit_user_id').value = id;
     document.getElementById('edit_name').value = name;
     document.getElementById('edit_email').value = email;
     document.getElementById('edit_role').value = role;
+    if(document.getElementById('edit_department')) {
+        document.getElementById('edit_department').value = department || 'Computer Science';
+    }
     openModal('editModal');
 }
 function openPasswordModal(id) {

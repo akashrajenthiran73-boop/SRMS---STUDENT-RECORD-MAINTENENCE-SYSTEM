@@ -390,13 +390,18 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-line"></i> <span>Result Analysis</span></a></li>
             <li><a href="marks.php"><i class="fa-solid fa-award"></i> <span>Marks / Grades</span></a></li>
 
+            <li class="nav-category">College & Campus</li>
+            <li><a href="circulars.php"><i class="fa-solid fa-bullhorn"></i> <span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> <span>Events & Calendar</span></a></li>
+            <li><a href="grievance.php"><i class="fa-solid fa-headset"></i> <span>Student Grievance</span></a></li>
+
             <li class="nav-category">Academic & Services</li>
             <li><a href="timetable.php"><i class="fa-solid fa-calendar-days"></i> <span>Timetable</span></a></li>
             <li><a href="assignments.php"><i class="fa-solid fa-file-pen"></i> <span>Assignments</span></a></li>
             <li><a href="student_leave.php"><i class="fa-solid fa-envelope-open-text"></i> <span>Leave / OD Request</span></a></li>
             <li><a href="syllabus_materials.php"><i class="fa-solid fa-book-open"></i> <span>Syllabus & Materials</span></a></li>
             <li><a href="download_certificates.php"><i class="fa-solid fa-file-arrow-down"></i> <span>Download Certificates</span></a></li>
-            <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></a></li>
+            <li><a href="announcements.php"><i class="fa-solid fa-bell"></i> <span>Announcements</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -420,6 +425,9 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             <p>Welcome to your academic records and services workspace</p>
         </div>
         <div class="user-profile">
+            <span style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1D4ED8; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-building-columns"></i> <?=htmlspecialchars($department)?>
+            </span>
             <div class="role-badge">
                 <i class="fa-solid fa-graduation-cap"></i> Student
             </div>
@@ -527,6 +535,18 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
                     <span>Quick Academic Actions</span>
                 </div>
                 <div class="quick-actions">
+                    <a href="circulars.php" class="action-item">
+                        <i class="fa-solid fa-bullhorn" style="background:#EFF6FF; color:#2563EB;"></i>
+                        <span>Circulars & Notices</span>
+                    </a>
+                    <a href="events.php" class="action-item">
+                        <i class="fa-solid fa-calendar-check" style="background:#F3E8FF; color:#7C3AED;"></i>
+                        <span>Campus Events</span>
+                    </a>
+                    <a href="grievance.php" class="action-item">
+                        <i class="fa-solid fa-headset" style="background:#FEF3C7; color:#D97706;"></i>
+                        <span>File Grievance</span>
+                    </a>
                     <a href="timetable.php" class="action-item">
                         <i class="fa-solid fa-calendar-days"></i>
                         <span>Class Timetable</span>

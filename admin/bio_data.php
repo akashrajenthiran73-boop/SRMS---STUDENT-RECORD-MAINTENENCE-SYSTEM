@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -61,6 +63,30 @@ if ($curl_error) {
     if (!is_array($bio_data_list)) $bio_data_list = [];
 } else {
     $error = "Database Error: HTTP $http_code - " . $response;
+}
+
+require_once __DIR__ . '/../includes/college_data.php';
+$departments = get_all_departments();
+$selected_dept = $_GET['dept'] ?? 'All';
+$selected_year = $_GET['year'] ?? 'All';
+
+// 1. Filter by Department
+if ($selected_dept !== 'All' && !empty($bio_data_list)) {
+    $bio_data_list = array_filter($bio_data_list, function($b) use ($selected_dept) {
+        $d = strtoupper($b['department'] ?? '');
+        if ($selected_dept === 'CS') {
+            return (strpos($d, 'CS') !== false || strpos($d, 'COMPUTER') !== false || empty($d));
+        }
+        return (strpos($d, strtoupper($selected_dept)) !== false);
+    });
+}
+
+// 2. Filter by Academic Year & Degree Level
+if ($selected_year !== 'All' && !empty($bio_data_list)) {
+    $bio_data_list = array_filter($bio_data_list, function($b) use ($selected_year) {
+        $info = get_student_year_info($b);
+        return ($info['filter_tag'] === $selected_year || $info['level'] === $selected_year);
+    });
 }
 ?>
 <!DOCTYPE html>
@@ -427,7 +453,7 @@ td {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">
@@ -439,11 +465,18 @@ td {
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-pie"></i> <span>Result Analysis</span></a></li>
 
             <hr class="menu-divider">
+            <div class="menu-heading">College Operations</div>
+            <li><a href="manage_departments.php"><i class="fa-solid fa-building-columns"></i> <span>Manage Departments</span></a></li>
+            <li><a href="circulars.php"><i class="fa-solid fa-envelope-open-text"></i> <span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> <span>Academic Events</span></a></li>
+            <li><a href="grievances.php"><i class="fa-solid fa-comments"></i> <span>Student Grievances</span></a></li>
+
+            <hr class="menu-divider">
             <div class="menu-heading">Admin Panel</div>
             <li><a href="manage_users.php"><i class="fa-solid fa-users-gear"></i> <span>Manage Users</span></a></li>
             <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></a></li>
             <li><a href="backup.php"><i class="fa-solid fa-database"></i> <span>Backup & Restore</span></a></li>
-            <li><a href="reports.php"><i class="fa-solid fa-file-lines"></i> <span>Reports</span></a></li>
+            <li><a href="reports.php"><i class="fa-solid fa-chart-line"></i> <span>Reports</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -468,6 +501,41 @@ td {
 
     <div class="content-body">
         
+        <!-- DUAL FILTER BAR: DEPARTMENT & ACADEMIC YEAR -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <form method="GET" action="bio_data.php" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <span style="font-size: 13px; font-weight: 700; color: #475569;"><i class="fa-solid fa-filter" style="color: #2563EB;"></i> Department:</span>
+                <select name="dept" onchange="this.form.submit()" style="padding: 8px 14px; border: 1.5px solid #E2E8F0; border-radius: 8px; font-size: 13px; font-weight: 600; outline: none; background: #F8FAFC;">
+                    <option value="All" <?php echo $selected_dept === 'All' ? 'selected' : ''; ?>>All Departments</option>
+                    <?php foreach ($departments as $d): ?>
+                        <option value="<?php echo $d['code']; ?>" <?php echo $selected_dept === $d['code'] ? 'selected' : ''; ?>>
+                            <?php echo $d['code'] . ' - ' . $d['name'] . ($d['code'] === 'CS' ? ' (Active)' : ''); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <span style="font-size: 13px; font-weight: 700; color: #475569; margin-left: 6px;"><i class="fa-solid fa-graduation-cap" style="color: #2563EB;"></i> Class / Year:</span>
+                <select name="year" onchange="this.form.submit()" style="padding: 8px 14px; border: 1.5px solid #E2E8F0; border-radius: 8px; font-size: 13px; font-weight: 600; outline: none; background: #F8FAFC;">
+                    <option value="All" <?=$selected_year === 'All' ? 'selected' : ''?>>All Years & Degrees</option>
+                    <option value="UG_1" <?=$selected_year === 'UG_1' ? 'selected' : ''?>>UG - 1st Year (I Year)</option>
+                    <option value="UG_2" <?=$selected_year === 'UG_2' ? 'selected' : ''?>>UG - 2nd Year (II Year)</option>
+                    <option value="UG_3" <?=$selected_year === 'UG_3' ? 'selected' : ''?>>UG - 3rd Year (III Year)</option>
+                    <option value="PG_1" <?=$selected_year === 'PG_1' ? 'selected' : ''?>>PG - 1st Year (I M.Sc/M.A/M.Com)</option>
+                    <option value="PG_2" <?=$selected_year === 'PG_2' ? 'selected' : ''?>>PG - 2nd Year (II M.Sc/M.A/M.Com)</option>
+                </select>
+
+                <?php if ($selected_dept !== 'All' || $selected_year !== 'All'): ?>
+                    <a href="bio_data.php" class="btn btn-light" style="padding: 6px 12px; font-size: 12px; background: #F1F5F9; border: 1px solid #CBD5E1; color: #475569; border-radius: 6px; text-decoration: none;"><i class="fa-solid fa-xmark"></i> Clear Filters</a>
+                <?php endif; ?>
+            </form>
+            <div style="font-size: 12.5px; color: #64748B;">
+                Scope: <strong style="color: #1E40AF;"><?php echo ($selected_dept === 'All') ? 'All Depts' : ($selected_dept . ' Dept'); ?></strong>
+                <?php if ($selected_year !== 'All'): ?>
+                    &nbsp;|&nbsp; Year: <strong style="color: #7C3AED;"><?=$selected_year?></strong>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <div class="table-card">
             
             <div class="header-actions">
@@ -491,8 +559,8 @@ td {
                             <th>S.No</th>
                             <th>Name</th>
                             <th>Department</th>
-                            <th>Class</th>
-                            <th>Academic Year</th>
+                            <th>Academic Class</th>
+                            <th>Batch</th>
                             <th>Tamil Reg No</th>
                             <th>Actions</th>
                         </tr>
@@ -501,12 +569,24 @@ td {
                         <?php if(empty($bio_data_list)): ?>
                             <tr><td colspan="7" style="text-align:center; padding: 30px; color: #64748B;">No Records Found.</td></tr>
                         <?php else: ?>
-                            <?php $i=1; foreach($bio_data_list as $row): ?>
+                            <?php 
+                            $i=1; 
+                            foreach($bio_data_list as $row): 
+                                $yinfo = get_student_year_info($row);
+                            ?>
                             <tr>
                                 <td><?php echo $i++; ?></td>
                                 <td style="font-weight: 600; color: #1E293B;"><?php echo htmlspecialchars($row['name_ta_en'] ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($row['department'] ?? '-'); ?></td>
-                                <td><?php echo htmlspecialchars($row['class'] ?? '-'); ?></td>
+                                <td>
+                                    <span style="background: #EFF6FF; color: #1D4ED8; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; display: inline-block;">
+                                        <?php echo htmlspecialchars($row['department'] ?? '-'); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="background: #F3E8FF; color: #7C3AED; font-weight: 700; font-size: 11.5px; padding: 4px 10px; border-radius: 6px; border: 1px solid #E9D5FF; display: inline-flex; align-items: center; gap: 5px;">
+                                        <i class="fa-solid <?=$yinfo['level'] === 'PG' ? 'fa-award' : 'fa-graduation-cap'?>"></i> <?=htmlspecialchars($yinfo['short'])?>
+                                    </span>
+                                </td>
                                 <td><?php echo htmlspecialchars($row['academic_year'] ?? '-'); ?></td>
                                 <td><?php echo htmlspecialchars($row['tamil_reg_no'] ?? '-'); ?></td>
                                 <td>

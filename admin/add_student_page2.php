@@ -76,10 +76,20 @@ if (isset($_POST['submit'])) {
 
     $data = array_merge($_SESSION['student_data'], $student_post); 
 
-    // Remove action buttons
+    // Remove action buttons and extra form helpers
     unset($data['next']);
     unset($data['submit']);
     unset($data['back']);
+
+    // Calculate and preserve academic class and year level
+    require_once __DIR__ . '/../includes/college_data.php';
+    $ylevel = $data['academic_year_level'] ?? 'UG_1';
+    $data['academic_year_level'] = $ylevel;
+    $data['degree_level'] = (strpos($ylevel, 'PG') === 0) ? 'PG' : 'UG';
+
+    $course = strtoupper(trim($data['course'] ?? 'CS'));
+    $classes = get_department_classes($course);
+    $data['academic_class'] = $classes[$ylevel]['short'] ?? ($ylevel === 'UG_1' ? 'I B.Sc' : 'III B.Sc');
 
     // Set fallback image if photo URL is empty
     if (empty($data['photo_url'])) {
@@ -561,7 +571,7 @@ textarea {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">

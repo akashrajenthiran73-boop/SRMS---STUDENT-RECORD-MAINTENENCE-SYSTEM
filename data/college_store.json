@@ -1,0 +1,2843 @@
+{
+    "departments": [
+        {
+            "id": "dept_tam",
+            "code": "TAM",
+            "category": "Arts & Commerce",
+            "name": "Department of Tamil",
+            "degrees": "B.A Tamil Literature, M.A Tamil, Ph.D.",
+            "hod_name": "Dr. K. Ilangovan, M.A., Ph.D.",
+            "hod_email": "hod.tam@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 170,
+            "status": "Active",
+            "established": 1968,
+            "is_core": false,
+            "description": "Classical Tamil literature, linguistics, folk arts, and historic research studies."
+        },
+        {
+            "id": "dept_eng",
+            "code": "ENG",
+            "category": "Arts & Commerce",
+            "name": "Department of English",
+            "degrees": "B.A English Literature, M.A English",
+            "hod_name": "Dr. S. Radhakrishnan, M.A., Ph.D.",
+            "hod_email": "hod.eng@aagacvpm.edu.in",
+            "faculty_count": 7,
+            "student_count": 160,
+            "status": "Active",
+            "established": 1970,
+            "is_core": false,
+            "description": "English literature, linguistics, communication skills, and creative writing programs."
+        },
+        {
+            "id": "dept_hist",
+            "code": "HIST",
+            "category": "Arts & Commerce",
+            "name": "Department of History",
+            "degrees": "B.A History, M.A History",
+            "hod_name": "Dr. M. Senthilkumar, M.A., Ph.D.",
+            "hod_email": "hod.hist@aagacvpm.edu.in",
+            "faculty_count": 6,
+            "student_count": 150,
+            "status": "Active",
+            "established": 1969,
+            "is_core": false,
+            "description": "Ancient, medieval, modern history, archaeology, and Indian constitutional studies."
+        },
+        {
+            "id": "dept_eco",
+            "code": "ECO",
+            "category": "Arts & Commerce",
+            "name": "Department of Economics",
+            "degrees": "B.A Economics, M.A Economics",
+            "hod_name": "Dr. V. Jayachandran, M.A., Ph.D.",
+            "hod_email": "hod.eco@aagacvpm.edu.in",
+            "faculty_count": 6,
+            "student_count": 150,
+            "status": "Active",
+            "established": 1972,
+            "is_core": false,
+            "description": "Micro and macro economics, fiscal policy, rural development, and econometrics."
+        },
+        {
+            "id": "dept_comm",
+            "code": "COMM",
+            "category": "Arts & Commerce",
+            "name": "Department of Commerce",
+            "degrees": "B.Com (General), M.Com",
+            "hod_name": "Dr. N. Sundararajan, M.Com., M.Phil., Ph.D.",
+            "hod_email": "hod.comm@aagacvpm.edu.in",
+            "faculty_count": 9,
+            "student_count": 240,
+            "status": "Active",
+            "established": 1975,
+            "is_core": false,
+            "description": "Accounting, financial management, taxation, and corporate governance studies."
+        },
+        {
+            "id": "dept_math",
+            "code": "MATH",
+            "category": "Science & IT",
+            "name": "Department of Mathematics",
+            "degrees": "B.Sc Mathematics, M.Sc Mathematics",
+            "hod_name": "Dr. R. Meenakshi, M.Sc., Ph.D.",
+            "hod_email": "hod.math@aagacvpm.edu.in",
+            "faculty_count": 7,
+            "student_count": 160,
+            "status": "Active",
+            "established": 1978,
+            "is_core": false,
+            "description": "Pure and applied mathematics fostering logical thinking and statistical analysis."
+        },
+        {
+            "id": "dept_phy",
+            "code": "PHY",
+            "category": "Science & IT",
+            "name": "Department of Physics",
+            "degrees": "B.Sc Physics, M.Sc Physics",
+            "hod_name": "Dr. M. Selvam, M.Sc., Ph.D.",
+            "hod_email": "hod.phy@aagacvpm.edu.in",
+            "faculty_count": 6,
+            "student_count": 140,
+            "status": "Active",
+            "established": 1982,
+            "is_core": false,
+            "description": "Equipped with modern optics and electronics laboratories for advanced scientific study."
+        },
+        {
+            "id": "dept_chem",
+            "code": "CHEM",
+            "category": "Science & IT",
+            "name": "Department of Chemistry",
+            "degrees": "B.Sc Chemistry, M.Sc Chemistry",
+            "hod_name": "Dr. P. Annamalai, M.Sc., Ph.D.",
+            "hod_email": "hod.chem@aagacvpm.edu.in",
+            "faculty_count": 6,
+            "student_count": 140,
+            "status": "Active",
+            "established": 1985,
+            "is_core": false,
+            "description": "Organic, inorganic and analytical chemistry research and practical laboratories."
+        },
+        {
+            "id": "dept_bot",
+            "code": "BOT",
+            "category": "Science & IT",
+            "name": "Department of Botany",
+            "degrees": "B.Sc Botany, M.Sc Botany",
+            "hod_name": "Dr. S. Thangavel, M.Sc., Ph.D.",
+            "hod_email": "hod.bot@aagacvpm.edu.in",
+            "faculty_count": 6,
+            "student_count": 130,
+            "status": "Active",
+            "established": 1986,
+            "is_core": false,
+            "description": "Plant biology, biotechnology, environmental science, and herbal pharmacology."
+        },
+        {
+            "id": "dept_zoo",
+            "code": "ZOO",
+            "category": "Science & IT",
+            "name": "Department of Zoology",
+            "degrees": "B.Sc Zoology, M.Sc Zoology",
+            "hod_name": "Dr. G. Sivakumar, M.Sc., Ph.D.",
+            "hod_email": "hod.zoo@aagacvpm.edu.in",
+            "faculty_count": 6,
+            "student_count": 130,
+            "status": "Active",
+            "established": 1988,
+            "is_core": false,
+            "description": "Animal physiology, genetics, immunology, marine biology, and biodiversity studies."
+        },
+        {
+            "id": "dept_stat",
+            "code": "STAT",
+            "category": "Science & IT",
+            "name": "Department of Statistics",
+            "degrees": "B.Sc Statistics, M.Sc Statistics",
+            "hod_name": "Dr. K. Ramasamy, M.Sc., Ph.D.",
+            "hod_email": "hod.stat@aagacvpm.edu.in",
+            "faculty_count": 5,
+            "student_count": 120,
+            "status": "Active",
+            "established": 1990,
+            "is_core": false,
+            "description": "Statistical theory, applied probability, data analytics, and operational research."
+        },
+        {
+            "id": "dept_cs",
+            "code": "CS",
+            "category": "Science & IT",
+            "name": "Department of Computer Science",
+            "degrees": "B.Sc Computer Science, M.Sc Computer Science",
+            "hod_name": "Dr. K. Arulmurugan, M.Sc., M.Phil., Ph.D.",
+            "hod_email": "hod.cs@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 180,
+            "status": "Active",
+            "established": 1998,
+            "is_core": true,
+            "description": "The premier computing department offering cutting-edge programs in software development, AI, data structures, and computer applications."
+        },
+        {
+            "id": "dept_bca",
+            "code": "BCA",
+            "category": "Science & IT",
+            "name": "Department of Computer Applications",
+            "degrees": "BCA (Bachelor of Computer Applications)",
+            "hod_name": "Prof. S. Venkatesan, MCA, M.Phil.",
+            "hod_email": "hod.bca@aagacvpm.edu.in",
+            "faculty_count": 6,
+            "student_count": 150,
+            "status": "Active",
+            "established": 2005,
+            "is_core": false,
+            "description": "Specialized applications and software solutions curriculum catering to industry-ready IT professionals."
+        },
+        {
+            "id": "dept_it",
+            "code": "IT",
+            "category": "Science & IT",
+            "name": "Department of Information Technology",
+            "degrees": "B.Sc Information Technology, M.Sc Information Technology",
+            "hod_name": "Dr. P. Ravichandran, M.Tech., Ph.D.",
+            "hod_email": "hod.it@aagacvpm.edu.in",
+            "faculty_count": 6,
+            "student_count": 140,
+            "status": "Active",
+            "established": 2010,
+            "is_core": false,
+            "description": "Network architecture, cloud infrastructure, cybersecurity, and enterprise systems engineering."
+        },
+        {
+            "id": "dept_test_dept_949_1789103999",
+            "code": "TEST_DEPT_949",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_949@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_562_1789104719",
+            "code": "TEST_DEPT_562",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_562@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_912_1789105423",
+            "code": "TEST_DEPT_912",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_912@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_954_1789108041",
+            "code": "TEST_DEPT_954",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_954@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_552_1789108145",
+            "code": "TEST_DEPT_552",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_552@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_293_1789108174",
+            "code": "TEST_DEPT_293",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_293@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_642_1789108619",
+            "code": "TEST_DEPT_642",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_642@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_898_1789187141",
+            "code": "TEST_DEPT_898",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_898@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_409_1789189028",
+            "code": "TEST_DEPT_409",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_409@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_757_1789189915",
+            "code": "TEST_DEPT_757",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_757@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_982_1789190755",
+            "code": "TEST_DEPT_982",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_982@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_955_1789190964",
+            "code": "TEST_DEPT_955",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_955@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_164_1789191727",
+            "code": "TEST_DEPT_164",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_164@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_628_1789210424",
+            "code": "TEST_DEPT_628",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_628@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_221_1789210831",
+            "code": "TEST_DEPT_221",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_221@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_837_1789210923",
+            "code": "TEST_DEPT_837",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_837@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_652_1789211413",
+            "code": "TEST_DEPT_652",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_652@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_654_1789212688",
+            "code": "TEST_DEPT_654",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_654@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_967_1789212743",
+            "code": "TEST_DEPT_967",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_967@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_457_1789212994",
+            "code": "TEST_DEPT_457",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_457@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_116_1789214303",
+            "code": "TEST_DEPT_116",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_116@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_820_1789214330",
+            "code": "TEST_DEPT_820",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_820@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_434_1789215292",
+            "code": "TEST_DEPT_434",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_434@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        },
+        {
+            "id": "dept_test_dept_708_1789217124",
+            "code": "TEST_DEPT_708",
+            "name": "Data Science & AI",
+            "degrees": "B.Sc",
+            "hod_name": "Dr. Test HOD",
+            "hod_email": "hod.test_dept_708@aagacvpm.edu.in",
+            "faculty_count": 8,
+            "student_count": 120,
+            "status": "Active",
+            "established": 2026,
+            "is_core": false,
+            "description": ""
+        }
+    ],
+    "circulars": [
+        {
+            "id": "cir_1789217124_514",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 9986",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789215292_217",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 8785",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789214330_484",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 6012",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789214303_738",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 3216",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789212994_260",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 3382",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789212743_399",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 8451",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789212688_163",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 9603",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789211413_390",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 4048",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789210923_215",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 5474",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789210831_974",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 1551",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789210424_678",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 4633",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789191727_892",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 9272",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789190964_707",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 1821",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789190755_485",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 8704",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789189915_214",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 6442",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789189028_619",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 6465",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789188980_633",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 4166",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789187141_961",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 1994",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-12",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789108619_601",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 5201",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789108174_185",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 6003",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789108145_757",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 6197",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789108041_626",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 6639",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789105423_125",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 3998",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789104719_863",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 5163",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789103999_202",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 6533",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789102832_685",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 1935",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789102584_697",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 9310",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789102448_516",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 3858",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789102395_600",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 2804",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789101139_234",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 1528",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789100230_794",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 5022",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        },
+        {
+            "id": "cir_1789099313_881",
+            "ref_no": "REF-UNIT-01",
+            "reference_no": "REF-UNIT-01",
+            "title": "Semester Exam Circular 9549",
+            "category": "Exam",
+            "target_dept": "CS",
+            "dept_code": "CS",
+            "priority": "Normal",
+            "publish_date": "2026-09-11",
+            "published_by": "Controller of Examinations",
+            "issued_by": "Controller of Examinations",
+            "summary": "",
+            "content": "Semester examination hall tickets are issued.",
+            "attachment": "",
+            "status": "Published"
+        }
+    ],
+    "events": [
+        {
+            "id": "ev_201",
+            "title": "CYBERFEST 2026 - CS State Level Technical Symposium",
+            "category": "Symposium",
+            "department": "CS",
+            "event_date": "2026-09-28",
+            "time": "09:30 AM - 04:30 PM",
+            "venue": "College Silver Jubilee Auditorium & Lab 1",
+            "coordinator": "Dr. K. Arulmurugan (HOD CS)",
+            "description": "Flagship inter-collegiate technical contest with Codeathon, Web Dev Hackathon, AI Project Expo, and Paper Presentations."
+        },
+        {
+            "id": "ev_202",
+            "title": "National Seminar on Advances in Applied Mathematics & Data Science",
+            "category": "Seminar",
+            "department": "MATH",
+            "event_date": "2026-10-06",
+            "time": "10:00 AM - 03:30 PM",
+            "venue": "Seminar Hall 2",
+            "coordinator": "Dr. R. Meenakshi (HOD Math)",
+            "description": "Keynote addresses by university professors on predictive modelling, cryptography, and stochastic processes."
+        },
+        {
+            "id": "ev_203",
+            "title": "Annual Inter-Departmental Sports & Athletic Meet 2026",
+            "category": "Sports",
+            "department": "All",
+            "event_date": "2026-10-18",
+            "time": "08:00 AM - 05:00 PM",
+            "venue": "College Main Sports Ground",
+            "coordinator": "Physical Education Director",
+            "description": "Track and field events, Cricket tournament finals, Volleyball, Kabaddi, and Chess championships."
+        },
+        {
+            "id": "ev_204",
+            "title": "54th College Annual Day & Graduation Honors Celebration",
+            "category": "Cultural",
+            "department": "All",
+            "event_date": "2026-11-05",
+            "time": "10:30 AM - 04:00 PM",
+            "venue": "Silver Jubilee Open Air Theatre",
+            "coordinator": "Principal & Faculty Committee",
+            "description": "Distinguished guest address, academic proficiency gold medals distribution, cultural dance & drama programs."
+        },
+        {
+            "id": "ev_1789024729_491",
+            "title": "Inter-Collegiate Hackathon 3935",
+            "category": "Academic",
+            "department": "All",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789024785_233",
+            "title": "Inter-Collegiate Hackathon 1073",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789024802_522",
+            "title": "Inter-Collegiate Hackathon 4357",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789091917_374",
+            "title": "Inter-Collegiate Hackathon 3067",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789098541_531",
+            "title": "Inter-Collegiate Hackathon 9000",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789099313_601",
+            "title": "Inter-Collegiate Hackathon 9981",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789100230_425",
+            "title": "Inter-Collegiate Hackathon 3729",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789101139_265",
+            "title": "Inter-Collegiate Hackathon 2392",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789102395_115",
+            "title": "Inter-Collegiate Hackathon 8752",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789102448_782",
+            "title": "Inter-Collegiate Hackathon 3821",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789102584_338",
+            "title": "Inter-Collegiate Hackathon 4918",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789102832_202",
+            "title": "Inter-Collegiate Hackathon 8845",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789103999_470",
+            "title": "Inter-Collegiate Hackathon 7155",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789104719_140",
+            "title": "Inter-Collegiate Hackathon 9471",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789105423_293",
+            "title": "Inter-Collegiate Hackathon 1584",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789108041_223",
+            "title": "Inter-Collegiate Hackathon 8649",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789108145_694",
+            "title": "Inter-Collegiate Hackathon 7456",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789108174_132",
+            "title": "Inter-Collegiate Hackathon 3943",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789108619_589",
+            "title": "Inter-Collegiate Hackathon 3755",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789187141_670",
+            "title": "Inter-Collegiate Hackathon 9646",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789188980_431",
+            "title": "Inter-Collegiate Hackathon 3650",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789189028_758",
+            "title": "Inter-Collegiate Hackathon 9252",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789189915_517",
+            "title": "Inter-Collegiate Hackathon 5751",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789190755_978",
+            "title": "Inter-Collegiate Hackathon 6245",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789190964_662",
+            "title": "Inter-Collegiate Hackathon 3394",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789191727_686",
+            "title": "Inter-Collegiate Hackathon 4261",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789210424_496",
+            "title": "Inter-Collegiate Hackathon 9106",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789210831_630",
+            "title": "Inter-Collegiate Hackathon 1231",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789210923_725",
+            "title": "Inter-Collegiate Hackathon 3934",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789211413_784",
+            "title": "Inter-Collegiate Hackathon 5692",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789212688_258",
+            "title": "Inter-Collegiate Hackathon 1906",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789212743_537",
+            "title": "Inter-Collegiate Hackathon 7313",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789212994_175",
+            "title": "Inter-Collegiate Hackathon 6428",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789214303_918",
+            "title": "Inter-Collegiate Hackathon 4774",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789214330_217",
+            "title": "Inter-Collegiate Hackathon 4709",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789215292_307",
+            "title": "Inter-Collegiate Hackathon 4341",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        },
+        {
+            "id": "ev_1789217124_643",
+            "title": "Inter-Collegiate Hackathon 5909",
+            "category": "Workshop",
+            "event_type": "Workshop",
+            "department": "CS",
+            "dept_code": "CS",
+            "event_date": "2026-10-15",
+            "time": "10:00 AM",
+            "venue": "CS Computing Lab 2",
+            "coordinator": "Faculty Coordinator",
+            "description": "24-hour national hackathon for undergrads."
+        }
+    ],
+    "grievances": [
+        {
+            "id": "grv_1789217124_77",
+            "ticket_no": "GRV-2026-514",
+            "student_id": "STU_TEST_587",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789215292_63",
+            "ticket_no": "GRV-2026-955",
+            "student_id": "STU_TEST_556",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789214330_48",
+            "ticket_no": "GRV-2026-538",
+            "student_id": "STU_TEST_950",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789214303_10",
+            "ticket_no": "GRV-2026-508",
+            "student_id": "STU_TEST_729",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789212994_53",
+            "ticket_no": "GRV-2026-968",
+            "student_id": "STU_TEST_422",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789212743_59",
+            "ticket_no": "GRV-2026-906",
+            "student_id": "STU_TEST_383",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789212688_26",
+            "ticket_no": "GRV-2026-246",
+            "student_id": "STU_TEST_129",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789211413_53",
+            "ticket_no": "GRV-2026-252",
+            "student_id": "STU_TEST_609",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789210923_42",
+            "ticket_no": "GRV-2026-698",
+            "student_id": "STU_TEST_715",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789210831_83",
+            "ticket_no": "GRV-2026-506",
+            "student_id": "STU_TEST_847",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Pending",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "",
+            "resolved_date": ""
+        },
+        {
+            "id": "grv_1789210424_25",
+            "ticket_no": "GRV-2026-324",
+            "student_id": "STU_TEST_597",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789191727_62",
+            "ticket_no": "GRV-2026-714",
+            "student_id": "STU_TEST_270",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789190964_55",
+            "ticket_no": "GRV-2026-873",
+            "student_id": "STU_TEST_294",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789190755_37",
+            "ticket_no": "GRV-2026-982",
+            "student_id": "STU_TEST_535",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789189915_34",
+            "ticket_no": "GRV-2026-749",
+            "student_id": "STU_TEST_532",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789189028_89",
+            "ticket_no": "GRV-2026-181",
+            "student_id": "STU_TEST_993",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789188980_30",
+            "ticket_no": "GRV-2026-974",
+            "student_id": "STU_TEST_483",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789187141_55",
+            "ticket_no": "GRV-2026-579",
+            "student_id": "STU_TEST_169",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-12",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-12"
+        },
+        {
+            "id": "grv_1789108619_48",
+            "ticket_no": "GRV-2026-356",
+            "student_id": "STU_TEST_293",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789108174_51",
+            "ticket_no": "GRV-2026-147",
+            "student_id": "STU_TEST_942",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789108145_42",
+            "ticket_no": "GRV-2026-758",
+            "student_id": "STU_TEST_697",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789108041_49",
+            "ticket_no": "GRV-2026-300",
+            "student_id": "STU_TEST_988",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789105423_76",
+            "ticket_no": "GRV-2026-875",
+            "student_id": "STU_TEST_643",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789104719_37",
+            "ticket_no": "GRV-2026-388",
+            "student_id": "STU_TEST_196",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789103999_82",
+            "ticket_no": "GRV-2026-906",
+            "student_id": "STU_TEST_859",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789102832_58",
+            "ticket_no": "GRV-2026-417",
+            "student_id": "STU_TEST_394",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789102584_35",
+            "ticket_no": "GRV-2026-329",
+            "student_id": "STU_TEST_416",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789102448_27",
+            "ticket_no": "GRV-2026-858",
+            "student_id": "STU_TEST_622",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789102395_28",
+            "ticket_no": "GRV-2026-539",
+            "student_id": "STU_TEST_743",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789101139_98",
+            "ticket_no": "GRV-2026-141",
+            "student_id": "STU_TEST_449",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789100230_85",
+            "ticket_no": "GRV-2026-619",
+            "student_id": "STU_TEST_358",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789099312_86",
+            "ticket_no": "GRV-2026-969",
+            "student_id": "STU_TEST_910",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789098540_21",
+            "ticket_no": "GRV-2026-250",
+            "student_id": "STU_TEST_121",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789091917_98",
+            "ticket_no": "GRV-2026-512",
+            "student_id": "STU_TEST_540",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-11",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-11"
+        },
+        {
+            "id": "grv_1789024802_79",
+            "ticket_no": "GRV-2026-105",
+            "student_id": "STU_TEST_847",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-10",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-10"
+        },
+        {
+            "id": "grv_1789024785_99",
+            "ticket_no": "GRV-2026-590",
+            "student_id": "STU_TEST_775",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-10",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-10"
+        },
+        {
+            "id": "grv_1789024729_50",
+            "ticket_no": "GRV-2026-309",
+            "student_id": "STU_TEST_651",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-10",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-10"
+        },
+        {
+            "id": "grv_1789024499_81",
+            "ticket_no": "GRV-2026-344",
+            "student_id": "STU_TEST_443",
+            "student_name": "Akash Unit Test",
+            "reg_no": "21UCS099",
+            "department": "CS",
+            "category": "Academic",
+            "subject": "CIA 2 Mark Clarification",
+            "description": "Need verification of marks scored in Algorithm Design.",
+            "status": "In Review",
+            "submitted_date": "2026-09-10",
+            "admin_reply": "Marks verified and updated in portal.",
+            "resolved_date": "2026-09-10"
+        },
+        {
+            "id": "grv_301",
+            "ticket_no": "GRV-2026-081",
+            "student_id": "STU1001",
+            "student_name": "Karthik Raja S",
+            "reg_no": "22CS104",
+            "department": "CS",
+            "category": "Bonafide / Certificates",
+            "subject": "Urgent Bonafide Certificate required for Passport Application",
+            "description": "Need Bonafide certificate urgently for passport appointment scheduled next Wednesday. Already submitted fee receipt at office.",
+            "status": "Resolved",
+            "submitted_date": "2026-09-02",
+            "admin_reply": "Bonafide certificate has been signed by the Principal and is ready for collection at the HOD CS office.",
+            "resolved_date": "2026-09-04"
+        },
+        {
+            "id": "grv_302",
+            "ticket_no": "GRV-2026-084",
+            "student_id": "STU1012",
+            "student_name": "Priya Dharshini M",
+            "reg_no": "22CS119",
+            "department": "CS",
+            "category": "Laboratory / Infrastructure",
+            "subject": "Python IDE installation in Computer Science Lab 2 systems",
+            "description": "Systems 12 to 18 in CS Lab 2 require Python 3.11 environment setup for semester lab practicals.",
+            "status": "In Review",
+            "submitted_date": "2026-09-06",
+            "admin_reply": "System administrator has been assigned to install and verify Python IDE and Jupyter packages by today afternoon.",
+            "resolved_date": ""
+        },
+        {
+            "id": "grv_303",
+            "ticket_no": "GRV-2026-089",
+            "student_id": "STU1024",
+            "student_name": "Vigneshwaran R",
+            "reg_no": "22CS142",
+            "department": "CS",
+            "category": "Examination / Hall Ticket",
+            "subject": "Name correction in University Exam Application portal",
+            "description": "Initial letter in my father name was misspelled in the University registration form. Requesting correction before hall ticket release.",
+            "status": "Pending",
+            "submitted_date": "2026-09-09",
+            "admin_reply": "",
+            "resolved_date": ""
+        }
+    ],
+    "timetables": {
+        "CS_UG_1": {
+            "I": [
+                {
+                    "sub": "Unit Test Isolated Slot",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "DIG-ELEC(SD)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "TAMIL(KRM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "ENG(ACA)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "MATH-I(GKM)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "II": [
+                {
+                    "sub": "ENG(ACA)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "C-PROG(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "C-LAB(RM)",
+                    "span": 2,
+                    "hour": 3
+                },
+                {
+                    "sub": "TAMIL(KRM)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "III": [
+                {
+                    "sub": "DIG-ELEC(SD)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "MATH-I(GKM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "C-PROG(RM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "ENG(ACA)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "OFFICE-AUTO",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "IV": [
+                {
+                    "sub": "TAMIL(KRM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "C-PROG(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "DIG-ELEC(SD)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "C-LAB(RM)",
+                    "span": 2,
+                    "hour": 4
+                }
+            ],
+            "V": [
+                {
+                    "sub": "MATH-I(GKM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "DIG-ELEC(SD)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "ENG(ACA)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "C-PROG(RM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "VE(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "VI": [
+                {
+                    "sub": "OFFICE-LAB",
+                    "span": 2,
+                    "hour": 1
+                },
+                {
+                    "sub": "TAMIL(KRM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "MATH-I(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "LIBRARY",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "Monday": [
+                {
+                    "sub": "Unit Test Isolated Slot",
+                    "span": 1,
+                    "hour": 1
+                }
+            ]
+        },
+        "CS_UG_3": {
+            "I": [
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "OS(ACA)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "PROJ-VIVA(ACA)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "V.Edu(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "II": [
+                {
+                    "sub": "OS(ACA)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "PROJ-VIVA(ACA)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "PROJ-VIVA(RM)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "III": [
+                {
+                    "sub": "OS(ACA)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "PROJ-VIVA(SD)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "Tnskill-SALESFORCE",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "IV": [
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "PROJ-VIVA(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "DM & W(SD)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "DBMS LAB(GKM)",
+                    "span": 2,
+                    "hour": 4
+                }
+            ],
+            "V": [
+                {
+                    "sub": "DM & W(SD)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "Tnskill-SALESFORCE",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "V.Edu(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "VI": [
+                {
+                    "sub": "DBMS LAB(GKM)",
+                    "span": 3,
+                    "hour": 1
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "DM & W(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ]
+        },
+        "CS_PG_1": {
+            "I": [
+                {
+                    "sub": "ADV-ALGO(RM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "CLOUD-COMP(ACA)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "DIST-SYS(GKM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "RESEARCH-METH",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "SEMINAR(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "II": [
+                {
+                    "sub": "DIST-SYS(GKM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "ADV-ALGO(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "CLOUD-LAB(ACA)",
+                    "span": 2,
+                    "hour": 3
+                },
+                {
+                    "sub": "ELECTIVE-I",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "III": [
+                {
+                    "sub": "CLOUD-COMP(ACA)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "DIST-SYS(GKM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "ADV-ALGO(RM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "RESEARCH-METH",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "AI-INTRO(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "IV": [
+                {
+                    "sub": "ADV-ALGO-LAB(RM)",
+                    "span": 2,
+                    "hour": 1
+                },
+                {
+                    "sub": "CLOUD-COMP(ACA)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "DIST-SYS(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "LIBRARY",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "V": [
+                {
+                    "sub": "AI-INTRO(SD)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "ADV-ALGO(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "CLOUD-COMP(ACA)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "ELECTIVE-I",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "MENTORING",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "VI": [
+                {
+                    "sub": "DIST-LAB(GKM)",
+                    "span": 2,
+                    "hour": 1
+                },
+                {
+                    "sub": "ADV-ALGO(RM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "CLOUD-COMP(ACA)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "COLLOQUIUM",
+                    "span": 1,
+                    "hour": 5
+                }
+            ]
+        },
+        "BOT_UG_1": {
+            "I": [
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "OS(ACA)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "PROJ-VIVA(ACA)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "V.Edu(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "II": [
+                {
+                    "sub": "OS(ACA)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "PROJ-VIVA(ACA)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "PROJ-VIVA(RM)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "III": [
+                {
+                    "sub": "OS(ACA)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "PROJ-VIVA(SD)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "Tnskill-SALESFORCE",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "IV": [
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "PROJ-VIVA(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "DM & W(SD)",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "DBMS LAB(GKM)",
+                    "span": 2,
+                    "hour": 4
+                }
+            ],
+            "V": [
+                {
+                    "sub": "DM & W(SD)",
+                    "span": 1,
+                    "hour": 1
+                },
+                {
+                    "sub": "SE(RM)",
+                    "span": 1,
+                    "hour": 2
+                },
+                {
+                    "sub": "Tnskill-SALESFORCE",
+                    "span": 1,
+                    "hour": 3
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "V.Edu(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ],
+            "VI": [
+                {
+                    "sub": "DBMS LAB(GKM)",
+                    "span": 3,
+                    "hour": 1
+                },
+                {
+                    "sub": "DBMS(GKM)",
+                    "span": 1,
+                    "hour": 4
+                },
+                {
+                    "sub": "DM & W(SD)",
+                    "span": 1,
+                    "hour": 5
+                }
+            ]
+        }
+    }
+}

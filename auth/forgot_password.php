@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forgot Password - Arignar Anna Gov Arts College</title>
+<title>Forgot Password - Arignar Anna Government Arts College</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -263,7 +263,7 @@ body {
   <!-- Left Branding Section -->
   <div class="brand-section">
     <div class="brand-badge"><i class="fa-solid fa-award"></i> Established 1967</div>
-    <h1>Arignar Anna Government Arts & Science College</h1>
+    <h1>Arignar Anna Government Arts College</h1>
     <p>Student Record Maintenance System (SRMS) provides secure access to academic profiles, marks, attendance, and certificates.</p>
   </div>
 
@@ -291,7 +291,7 @@ body {
 
 <!-- Footer -->
 <div class="footer-note">
-    &copy; 2026 Arignar Anna Government Arts & Science College. All rights reserved.
+    &copy; 2026 Arignar Anna Government Arts College. All rights reserved.
 </div>
 
 </body>

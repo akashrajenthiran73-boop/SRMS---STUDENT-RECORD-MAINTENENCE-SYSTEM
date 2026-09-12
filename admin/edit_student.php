@@ -45,10 +45,22 @@ if (!$result || count($result) == 0) {
 }
 $student = $result[0];
 
+require_once __DIR__ . '/../includes/college_data.php';
+$yinfo = get_student_year_info($student);
+
 // Handle Update Submit
 if (isset($_POST['update'])) {
     $data = $_POST;
     unset($data['update']);
+
+    // Set Degree Level & Academic Year & Academic Class
+    $ylevel = $data['academic_year_level'] ?? 'UG_3';
+    $data['academic_year_level'] = $ylevel;
+    $data['degree_level'] = (strpos($ylevel, 'PG') === 0) ? 'PG' : 'UG';
+
+    $course = strtoupper(trim($data['course'] ?? 'CS'));
+    $classes = get_department_classes($course);
+    $data['academic_class'] = $classes[$ylevel]['short'] ?? ($ylevel === 'UG_3' ? 'III B.Sc' : 'I B.Sc');
 
     // Process Dynamic Semester 1 to 6 Marks into JSON String
     for ($sem = 1; $sem <= 6; $sem++) {
@@ -545,7 +557,7 @@ input:focus, textarea:focus, select:focus {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">
@@ -606,7 +618,61 @@ input:focus, textarea:focus, select:focus {
 
                     <div class="grid-2">
                         <div class="form-group"><label>Admission No</label><input type="text" name="admission_no" value="<?php echo htmlspecialchars($student['admission_no'] ?? ''); ?>"></div>
-                        <div class="form-group"><label>Course</label><input type="text" name="course" value="<?php echo htmlspecialchars($student['course'] ?? ''); ?>"></div>
+                        <div class="form-group"><label>Roll No</label><input type="text" name="roll_no" value="<?php echo htmlspecialchars($student['roll_no'] ?? ''); ?>"></div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Course / Department</label>
+                            <select name="course" id="course_select" required onchange="syncEditClassAndMajor()">
+                                <?php 
+                                $current_course = strtoupper(trim($student['course'] ?? 'CS'));
+                                $course_groups = [
+                                    'Arts & Commerce' => [
+                                        'TAM' => 'TAM - Tamil',
+                                        'ENG' => 'ENG - English',
+                                        'HIST' => 'HIST - History',
+                                        'ECO' => 'ECO - Economics',
+                                        'COMM' => 'COMM - Commerce'
+                                    ],
+                                    'Science & IT' => [
+                                        'MATH' => 'MATH - Mathematics',
+                                        'PHY' => 'PHY - Physics',
+                                        'CHEM' => 'CHEM - Chemistry',
+                                        'BOT' => 'BOT - Botany',
+                                        'ZOO' => 'ZOO - Zoology',
+                                        'STAT' => 'STAT - Statistics',
+                                        'CS' => 'CS - Computer Science',
+                                        'BCA' => 'BCA - Computer Applications',
+                                        'IT' => 'IT - Information Technology'
+                                    ]
+                                ];
+                                foreach ($course_groups as $grp => $courses): ?>
+                                    <optgroup label="<?=$grp?>">
+                                    <?php foreach ($courses as $code => $label):
+                                        $sel = (strpos($current_course, $code) !== false || ($code === 'CS' && ($current_course === 'BSC' || empty($current_course)))) ? 'selected' : '';
+                                    ?>
+                                        <option value="<?=$code?>" <?=$sel?>><?=$label?></option>
+                                    <?php endforeach; ?>
+                                    </optgroup>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Degree Level & Academic Year</label>
+                            <select name="academic_year_level" id="year_level_select" onchange="syncEditClassAndMajor()">
+                                <option value="UG_1" <?=$yinfo['class_code'] === 'UG_1' ? 'selected' : ''?>>UG - 1st Year (I Year)</option>
+                                <option value="UG_2" <?=$yinfo['class_code'] === 'UG_2' ? 'selected' : ''?>>UG - 2nd Year (II Year)</option>
+                                <option value="UG_3" <?=$yinfo['class_code'] === 'UG_3' ? 'selected' : ''?>>UG - 3rd Year (III Year)</option>
+                                <option value="PG_1" <?=$yinfo['class_code'] === 'PG_1' ? 'selected' : ''?>>PG - 1st Year (I Year PG)</option>
+                                <option value="PG_2" <?=$yinfo['class_code'] === 'PG_2' ? 'selected' : ''?>>PG - 2nd Year (II Year PG)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group"><label>Main Subject / Degree Specialization</label><input type="text" name="main_subject" id="main_subject_input" value="<?php echo htmlspecialchars($student['main_subject'] ?? $yinfo['label']); ?>" required></div>
+                        <div class="form-group"><label>Medium</label><input type="text" name="medium" value="<?php echo htmlspecialchars($student['medium'] ?? 'English'); ?>"></div>
                     </div>
                 </div>
 
@@ -719,6 +785,53 @@ function calculateMarks(input) {
         pfInput.value = '';
         pfInput.className = '';
     }
+}
+
+function syncEditClassAndMajor() {
+    const courseEl = document.getElementById('course_select');
+    const ylevelEl = document.getElementById('year_level_select');
+    const majorEl = document.getElementById('main_subject_input');
+    if (!courseEl || !ylevelEl || !majorEl) return;
+
+    const course = courseEl.value;
+    const ylevel = ylevelEl.value;
+    const deptNames = {
+        'TAM': 'Tamil',
+        'ENG': 'English',
+        'HIST': 'History',
+        'ECO': 'Economics',
+        'COMM': 'Commerce',
+        'MATH': 'Mathematics',
+        'PHY': 'Physics',
+        'CHEM': 'Chemistry',
+        'BOT': 'Botany',
+        'ZOO': 'Zoology',
+        'STAT': 'Statistics',
+        'CS': 'Computer Science',
+        'BCA': 'Computer Applications',
+        'IT': 'Information Technology'
+    };
+    const deptName = deptNames[course] || course;
+    const isArts = ['TAM', 'ENG', 'HIST', 'ECO'].includes(course);
+
+    let degreePrefix = 'B.Sc';
+    if (course === 'COMM') degreePrefix = 'B.Com';
+    else if (course === 'BCA') degreePrefix = 'BCA';
+    else if (isArts) degreePrefix = 'B.A';
+
+    let yearNum = 'III';
+    if (ylevel === 'UG_1') yearNum = 'I';
+    else if (ylevel === 'UG_2') yearNum = 'II';
+    else if (ylevel === 'UG_3') yearNum = 'III';
+    else if (ylevel === 'PG_1') {
+        yearNum = 'I';
+        degreePrefix = (course === 'COMM') ? 'M.Com' : (isArts ? 'M.A' : 'M.Sc');
+    } else if (ylevel === 'PG_2') {
+        yearNum = 'II';
+        degreePrefix = (course === 'COMM') ? 'M.Com' : (isArts ? 'M.A' : 'M.Sc');
+    }
+
+    majorEl.value = yearNum + ' ' + degreePrefix + ' ' + deptName;
 }
 
 // Populate Existing Student Marks on Page Load

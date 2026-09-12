@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 if(!isset($_SESSION['user_id'])) { 
-    header("Location: login.php"); 
+    header("Location: ../auth/login.php"); 
     exit; 
 }
 
@@ -59,8 +59,9 @@ $base_url = rtrim($SUPABASE_URL, '/');
 $total_students = getSupabaseCount($base_url, $SUPABASE_KEY);
 $pending_count = getSupabaseCount($base_url, $SUPABASE_KEY, '&is_completed=is.false');
 
-// Assign HOD Name from Session safely
+// Assign HOD Name and Department from Session safely
 $hod_name = $_SESSION['hod_name'] ?? $_SESSION['name'] ?? $_SESSION['user_name'] ?? 'HOD Faculty';
+$hod_dept = $_SESSION['department'] ?? 'Computer Science';
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
@@ -168,11 +169,16 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             <li><a href="umis_form_list.php"><i class="fa-solid fa-database"></i> UMIS Data</a></li>
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-line"></i> Result Analysis</a></li>
 
+            <li class="nav-category">College & Dept</li>
+            <li><a href="circulars.php"><i class="fa-solid fa-bullhorn"></i> Circulars & Notices</a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> Events & Calendar</a></li>
+            <li><a href="grievances.php"><i class="fa-solid fa-headset"></i> Student Grievances</a></li>
+
             <li class="nav-category">Department Admin</li>
             <li><a href="leave_approvals.php"><i class="fa-solid fa-clipboard-check"></i> Leave Approvals</a></li>
             <li><a href="timetable.php"><i class="fa-solid fa-calendar-days"></i> Timetable</a></li>
             <li><a href="send_notice.php"><i class="fa-solid fa-paper-plane"></i> Send Notice</a></li>
-            <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
+            <li><a href="announcements.php"><i class="fa-solid fa-bell"></i> Announcements</a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> Help & Support</a></li>
         </ul>
     </div>
@@ -194,6 +200,9 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             <p>Head of Department executive operations and student records management</p>
         </div>
         <div class="user-profile">
+            <span style="background: #F1F5F9; border: 1px solid #CBD5E1; color: #334155; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-building-columns" style="color:#7C3AED;"></i> <?=htmlspecialchars($hod_dept)?> Dept
+            </span>
             <div class="role-badge">
                 <i class="fa-solid fa-user-shield"></i> HOD Access
             </div>
@@ -207,15 +216,18 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
         
         <div class="welcome-banner">
             <div>
+                <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.12); padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:700; margin-bottom:8px; border:1px solid rgba(255,255,255,0.2);">
+                    <i class="fa-solid fa-laptop-code"></i> Department of <?=htmlspecialchars($hod_dept)?>
+                </div>
                 <h2>Welcome Back, <?=htmlspecialchars($hod_name)?> 👋</h2>
-                <p>Monitor departmental academics, approve student credentials, and coordinate class schedules.</p>
+                <p>Monitor departmental academics, college circulars, student grievances, and timetable schedules.</p>
             </div>
         </div>
 
         <div class="stats-grid">
             <div class="stat-box stat-students">
                 <div class="stat-info">
-                    <h4>Total Registered Students</h4>
+                    <h4>Total Registered Students (CS)</h4>
                     <div class="num"><?=intval($total_students)?></div>
                 </div>
                 <div class="stat-icon">
@@ -234,7 +246,7 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
         </div>
 
         <div class="section-title">
-            <i class="fa-solid fa-grid-2"></i> Department Management Modules
+            <i class="fa-solid fa-shapes"></i> Department Management Modules
         </div>
 
         <div class="grid">
@@ -267,6 +279,36 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
                     <div class="icon-wrap"><i class="fa-solid fa-chart-line"></i></div>
                     <h3>Result Analysis</h3>
                     <p>Pass/Fail & Semester Stats</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="section-title" style="margin-top: 10px;">
+            <i class="fa-solid fa-building-columns"></i> College Operations & Support
+        </div>
+
+        <div class="grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 28px;">
+            <a href="circulars.php" class="card-link">
+                <div class="card card-purple">
+                    <div class="icon-wrap"><i class="fa-solid fa-bullhorn"></i></div>
+                    <h3>Circulars & Notices</h3>
+                    <p>College & Dept Circulars</p>
+                </div>
+            </a>
+
+            <a href="events.php" class="card-link">
+                <div class="card card-blue">
+                    <div class="icon-wrap"><i class="fa-solid fa-calendar-check"></i></div>
+                    <h3>Academic Events</h3>
+                    <p>Symposiums & Key Dates</p>
+                </div>
+            </a>
+
+            <a href="grievances.php" class="card-link">
+                <div class="card card-amber">
+                    <div class="icon-wrap"><i class="fa-solid fa-headset"></i></div>
+                    <h3>Student Grievances</h3>
+                    <p>Review & Resolve Tickets</p>
                 </div>
             </a>
         </div>

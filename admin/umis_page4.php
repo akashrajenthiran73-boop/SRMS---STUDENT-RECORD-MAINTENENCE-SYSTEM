@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set('display_errors', 1); 
 error_reporting(E_ALL);
 
@@ -24,27 +26,29 @@ foreach ($possible_env_paths as $path) {
 $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
 $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
 
-function callSupabase($url, $key, $method='GET', $data=null){
-    if (empty($url) || empty($key)) {
-        return [[], 0];
+if (!function_exists('callSupabase')) {
+    function callSupabase($url, $key, $method='GET', $data=null){
+        if (empty($url) || empty($key)) {
+            return [[], 0];
+        }
+        $ch = curl_init($url);
+        $headers = ["apikey: $key", "Authorization: Bearer $key"];
+        if($method == 'POST' || $method == 'PATCH'){ 
+            $headers[] = "Content-Type: application/json"; 
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method); 
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data)); 
+        }
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HTTPHEADER => $headers
+        ]);
+        $res = curl_exec($ch); 
+        $http = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+        curl_close($ch);
+        return [json_decode($res, true), $http];
     }
-    $ch = curl_init($url);
-    $headers = ["apikey: $key", "Authorization: Bearer $key"];
-    if($method == 'POST' || $method == 'PATCH'){ 
-        $headers[] = "Content-Type: application/json"; 
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method); 
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data)); 
-    }
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
-        CURLOPT_HTTPHEADER => $headers
-    ]);
-    $res = curl_exec($ch); 
-    $http = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
-    curl_close($ch);
-    return [json_decode($res, true), $http];
 }
 
 $student_id = $_GET['student_id'] ?? $_SESSION['student_id'] ?? '';
@@ -80,7 +84,34 @@ if (empty($SUPABASE_URL) || empty($SUPABASE_KEY)) {
     foreach($payload as $k => $v){ if($v === '') $payload[$k] = null; }
 
     $base_url = rtrim($SUPABASE_URL, '/');
+
+    // Derive academic year and class fields if year_of_study is provided
+    if (!empty($payload['year_of_study'])) {
+        require_once __DIR__ . '/../includes/college_data.php';
+        $yraw = strtoupper((string)$payload['year_of_study']);
+        $ylevel = 'UG_1';
+        if (strpos($yraw, 'PG') !== false) {
+            $ylevel = (strpos($yraw, '2') !== false) ? 'PG_2' : 'PG_1';
+        } else {
+            if (strpos($yraw, '3') !== false) $ylevel = 'UG_3';
+            elseif (strpos($yraw, '2') !== false) $ylevel = 'UG_2';
+            else $ylevel = 'UG_1';
+        }
+        $payload['academic_year_level'] = $ylevel;
+        $payload['degree_level'] = (strpos($ylevel, 'PG') === 0) ? 'PG' : 'UG';
+        $c = $data['course'] ?? 'CS';
+        $classes = get_department_classes($c);
+        $payload['academic_class'] = $classes[$ylevel]['short'] ?? 'I B.Sc';
+    }
+
     list($res, $http) = callSupabase("$base_url/rest/v1/umis_students?student_id=eq." . urlencode($student_id), $SUPABASE_KEY, 'PATCH', $payload);
+
+    // If Supabase schema doesn't have academic_class/academic_year_level yet, gracefully retry without them
+    $raw_resp_str = is_array($res) ? json_encode($res) : (string)$res;
+    if ($http == 400 && strpos($raw_resp_str, 'Could not find the') !== false) {
+        unset($payload['academic_class'], $payload['academic_year_level'], $payload['degree_level']);
+        list($res, $http) = callSupabase("$base_url/rest/v1/umis_students?student_id=eq." . urlencode($student_id), $SUPABASE_KEY, 'PATCH', $payload);
+    }
 
     if($http >= 200 && $http < 300) {
         header("Location: umis.php?msg=success"); 
@@ -601,7 +632,7 @@ button[type="submit"]:hover {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">
@@ -712,7 +743,16 @@ button[type="submit"]:hover {
                     <div class="row">
                         <div class="g"><label>77. Current Status</label><input type="text" name="current_status" value="<?=v('current_status','Studying in this Institute')?>"></div>
                         <div class="g"><label>78. Course Completed Year</label><input type="text" name="year_of_course_completed" value="<?=v('year_of_course_completed')?>"></div>
-                        <div class="g"><label>79. Year of Study</label><input type="text" name="year_of_study" value="<?=v('year_of_study','1st Year')?>"></div>
+                        <div class="g">
+                            <label>79. Year of Study & Degree Level</label>
+                            <select name="year_of_study">
+                                <option value="1st Year" <?=(v('year_of_study')=='1st Year'||v('year_of_study')=='UG_1')?'selected':''?>>UG - 1st Year (I Year)</option>
+                                <option value="2nd Year" <?=(v('year_of_study')=='2nd Year'||v('year_of_study')=='UG_2')?'selected':''?>>UG - 2nd Year (II Year)</option>
+                                <option value="3rd Year" <?=(v('year_of_study')=='3rd Year'||v('year_of_study')=='UG_3'||v('year_of_study')=='')?'selected':''?>>UG - 3rd Year (III Year)</option>
+                                <option value="1st Year PG" <?=(v('year_of_study')=='1st Year PG'||v('year_of_study')=='PG_1')?'selected':''?>>PG - 1st Year (I PG)</option>
+                                <option value="2nd Year PG" <?=(v('year_of_study')=='2nd Year PG'||v('year_of_study')=='PG_2')?'selected':''?>>PG - 2nd Year (II PG)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="form-group" style="margin-top: 10px;">

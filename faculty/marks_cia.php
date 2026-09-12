@@ -326,6 +326,10 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             <li><a href="umis_data.php"><i class="fa-solid fa-database"></i> UMIS Data</a></li>
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-line"></i> Result Analysis</a></li>
 
+            <li class="nav-category">College & Dept</li>
+            <li><a href="circulars.php"><i class="fa-solid fa-bullhorn"></i> Circulars & Notices</a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> Events & Calendar</a></li>
+
             <li class="nav-category">Faculty Panel</li>
             <li><a href="student_leave_requests.php"><i class="fa-solid fa-envelope-open-text"></i> Student Leave Requests</a></li>
             <li><a href="leave_faculty.php"><i class="fa-solid fa-calendar-check"></i> Apply Leave / OD</a></li>
@@ -334,7 +338,7 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             <li><a href="syllabus_materials.php"><i class="fa-solid fa-file-pdf"></i> Syllabus & Materials</a></li>
             <li><a href="assignments.php"><i class="fa-solid fa-tasks"></i> Assignments</a></li>
             <li><a href="timetable.php"><i class="fa-solid fa-calendar-days"></i> Timetable</a></li>
-            <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> Announcements</a></li>
+            <li><a href="announcements.php"><i class="fa-solid fa-bell"></i> Announcements</a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> Help & Support</a></li>
         </ul>
     </div>

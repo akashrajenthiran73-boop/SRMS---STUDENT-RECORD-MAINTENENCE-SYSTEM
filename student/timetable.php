@@ -9,111 +9,48 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
     exit();
 }
 
-$role = $_SESSION['role']; // 'Student', 'Faculty', 'HOD' / 'Admin' / 'Super Admin'
-$can_edit = in_array($role, ['HOD', 'Admin', 'Super Admin', 'Faculty']);
-$is_hod = in_array($role, ['HOD', 'Admin', 'Super Admin']);
+$role = $_SESSION['role'];
+$can_edit = false; // Students are read-only
+$is_hod = false;
 
-// 2. Load Supabase Environment Variables
-$env_path = __DIR__ . '/../.env';
-$SUPABASE_URL = '';
-$SUPABASE_KEY = '';
+require_once __DIR__ . '/../includes/college_data.php';
 
-if (file_exists($env_path)) {
-    $env = parse_ini_file($env_path);
-    $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
-    $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
+// 2. Department and Class resolution for Student
+$raw_dept = $_SESSION['department'] ?? 'CS';
+$student_dept = 'CS';
+$up = strtoupper($raw_dept);
+if (strpos($up, 'MATH') !== false) $student_dept = 'MATH';
+elseif (strpos($up, 'BCA') !== false || strpos($up, 'APPLICATION') !== false) $student_dept = 'BCA';
+elseif (strpos($up, 'PHY') !== false) $student_dept = 'PHY';
+elseif (strpos($up, 'CHEM') !== false) $student_dept = 'CHEM';
+elseif (strpos($up, 'BOT') !== false) $student_dept = 'BOT';
+elseif (strpos($up, 'ZOO') !== false) $student_dept = 'ZOO';
+elseif (strpos($up, 'STAT') !== false) $student_dept = 'STAT';
+elseif (strpos($up, 'COMM') !== false) $student_dept = 'COMM';
+elseif (strpos($up, 'HIST') !== false) $student_dept = 'HIST';
+elseif (strpos($up, 'ECO') !== false) $student_dept = 'ECO';
+elseif (strpos($up, 'ENG') !== false) $student_dept = 'ENG';
+elseif (strpos($up, 'TAM') !== false) $student_dept = 'TAM';
+elseif (strpos($up, 'INFO') !== false || strpos($up, ' IT') !== false || $up === 'IT') $student_dept = 'IT';
+
+$available_classes = get_department_classes($student_dept);
+
+// Detect student class from reg_no or default to UG_3
+$student_class = 'UG_3';
+$reg_no = $_SESSION['exam_reg_no'] ?? $_SESSION['reg_no'] ?? '';
+if (!empty($reg_no)) {
+    if (strpos($reg_no, '26') !== false) $student_class = 'UG_1';
+    elseif (strpos($reg_no, '25') !== false) $student_class = 'UG_2';
 }
 
-// 3. Handle AJAX Save Request (Inline Backend API Handler)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
-    header('Content-Type: application/json');
-
-    if (!$can_edit) {
-        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-        exit();
-    }
-
-    $input = json_decode(file_get_contents('php://input'), true);
-    $day = $input['day'] ?? '';
-    $hour = $input['hour'] ?? 1;
-    $subject = $input['subject'] ?? '';
-    $span = $input['span'] ?? 1;
-
-    $url = $SUPABASE_URL . "/rest/v1/timetable?on_conflict=day_order,hour_slot";
-    $payload = json_encode([
-        'day_order' => $day,
-        'hour_slot' => (int)$hour,
-        'subject_code' => $subject,
-        'colspan' => (int)$span
-    ]);
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "apikey: $SUPABASE_KEY",
-        "Authorization: Bearer $SUPABASE_KEY",
-        "Content-Type: application/json",
-        "Prefer: resolution=merge-duplicates"
-    ]);
-
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($http_code == 200 || $http_code == 201) {
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['success' => false, 'error' => $response]);
-    }
-    exit();
+$selected_class = $_GET['class'] ?? $student_class;
+if (!isset($available_classes[$selected_class])) {
+    $selected_class = $student_class;
 }
+$class_info = $available_classes[$selected_class];
 
-// 4. Default Timetable Structure (Fallback Data)
-$timetable = [
-    'I'   => [['sub' => 'SE(RM)', 'span' => 1, 'hour' => 1], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 2], ['sub' => 'OS(ACA)', 'span' => 1, 'hour' => 3], ['sub' => 'PROJ-VIVA(ACA)', 'span' => 1, 'hour' => 4], ['sub' => 'V.Edu(SD)', 'span' => 1, 'hour' => 5]],
-    'II'  => [['sub' => 'OS(ACA)', 'span' => 1, 'hour' => 1], ['sub' => 'PROJ-VIVA(ACA)', 'span' => 1, 'hour' => 2], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 3], ['sub' => 'SE(RM)', 'span' => 1, 'hour' => 4], ['sub' => 'PROJ-VIVA(RM)', 'span' => 1, 'hour' => 5]],
-    'III' => [['sub' => 'OS(ACA)', 'span' => 1, 'hour' => 1], ['sub' => 'PROJ-VIVA(SD)', 'span' => 1, 'hour' => 2], ['sub' => 'SE(RM)', 'span' => 1, 'hour' => 3], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 4], ['sub' => 'Tnskill-SALESFORCE', 'span' => 1, 'hour' => 5]],
-    'IV'  => [['sub' => 'SE(RM)', 'span' => 1, 'hour' => 1], ['sub' => 'PROJ-VIVA(RM)', 'span' => 1, 'hour' => 2], ['sub' => 'DM & W(SD)', 'span' => 1, 'hour' => 3], ['sub' => 'DBMS LAB(GKM)', 'span' => 2, 'hour' => 4]],
-    'V'   => [['sub' => 'DM & W(SD)', 'span' => 1, 'hour' => 1], ['sub' => 'SE(RM)', 'span' => 1, 'hour' => 2], ['sub' => 'Tnskill-SALESFORCE', 'span' => 1, 'hour' => 3], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 4], ['sub' => 'V.Edu(SD)', 'span' => 1, 'hour' => 5]],
-    'VI'  => [['sub' => 'DBMS LAB(GKM)', 'span' => 3, 'hour' => 1], ['sub' => 'DBMS(GKM)', 'span' => 1, 'hour' => 4], ['sub' => 'DM & W(SD)', 'span' => 1, 'hour' => 5]]
-];
-
-// 5. Fetch Real-time Timetable Data from Supabase
-if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
-    $fetch_url = $SUPABASE_URL . "/rest/v1/timetable?select=*&order=day_order,hour_slot";
-    $ch = curl_init($fetch_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "apikey: $SUPABASE_KEY",
-        "Authorization: Bearer $SUPABASE_KEY"
-    ]);
-    $db_response = curl_exec($ch);
-    curl_close($ch);
-
-    $db_data = json_decode($db_response, true);
-
-    if (is_array($db_data) && !empty($db_data)) {
-        $db_timetable = ['I' => [], 'II' => [], 'III' => [], 'IV' => [], 'V' => [], 'VI' => []];
-        foreach ($db_data as $row) {
-            $day = $row['day_order'];
-            if (isset($db_timetable[$day])) {
-                $db_timetable[$day][] = [
-                    'sub' => $row['subject_code'],
-                    'span' => (int)$row['colspan'],
-                    'hour' => (int)$row['hour_slot']
-                ];
-            }
-        }
-        // Filter out empty days to use dynamic db data
-        foreach ($db_timetable as $d => $slots) {
-            if (!empty($slots)) {
-                $timetable[$d] = $slots;
-            }
-        }
-    }
-}
+// 3. Fetch Multi-Class Timetable Data
+$timetable = get_class_timetable($student_dept, $selected_class);
 $user_name = $_SESSION['name'] ?? $_SESSION['username'] ?? 'Student';
 ?>
 <!DOCTYPE html>
@@ -257,6 +194,53 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
 
 /* Content Body */
 .content-body { padding: 30px 36px; }
+
+/* Class Navigation Tabs */
+.class-nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.class-nav-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    overflow-x: auto;
+}
+
+.class-tab-btn {
+    padding: 8px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748B;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.class-tab-btn:hover {
+    color: #059669;
+    background: #ECFDF5;
+}
+
+.class-tab-btn.active {
+    background: #059669;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+}
 
 /* Page Header Card */
 .page-header {
@@ -552,13 +536,18 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-line"></i> <span>Result Analysis</span></a></li>
             <li><a href="marks.php"><i class="fa-solid fa-award"></i> <span>Marks / Grades</span></a></li>
 
+            <li class="nav-category">College & Campus</li>
+            <li><a href="circulars.php"><i class="fa-solid fa-bullhorn"></i> <span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> <span>Events & Calendar</span></a></li>
+            <li><a href="grievance.php"><i class="fa-solid fa-headset"></i> <span>Student Grievance</span></a></li>
+
             <li class="nav-category">Academic & Services</li>
             <li><a href="timetable.php" class="active"><i class="fa-solid fa-calendar-days"></i> <span>Timetable</span></a></li>
             <li><a href="assignments.php"><i class="fa-solid fa-file-pen"></i> <span>Assignments</span></a></li>
             <li><a href="student_leave.php"><i class="fa-solid fa-envelope-open-text"></i> <span>Leave / OD Request</span></a></li>
             <li><a href="syllabus_materials.php"><i class="fa-solid fa-book-open"></i> <span>Syllabus & Materials</span></a></li>
             <li><a href="download_certificates.php"><i class="fa-solid fa-file-arrow-down"></i> <span>Download Certificates</span></a></li>
-            <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></a></li>
+            <li><a href="announcements.php"><i class="fa-solid fa-bell"></i> <span>Announcements</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -593,6 +582,25 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
 
     <div class="content-body">
         
+        <!-- Class Selector Navigation for Student -->
+        <div class="class-nav-container">
+            <div class="class-nav-tabs">
+                <?php foreach ($available_classes as $ckey => $cdata): ?>
+                    <a href="timetable.php?class=<?=urlencode($ckey)?>" 
+                       class="class-tab-btn <?=$selected_class === $ckey ? 'active' : ''?>">
+                        <i class="fa-solid <?=$cdata['level'] === 'PG' ? 'fa-award' : 'fa-graduation-cap'?>"></i>
+                        <span><?=htmlspecialchars($cdata['short'])?></span>
+                        <?php if ($ckey === $student_class): ?>
+                            <span style="font-size: 10px; background: rgba(255,255,255,0.25); padding: 1px 6px; border-radius: 10px;">My Class</span>
+                        <?php endif; ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+            <div style="font-size: 12.5px; font-weight: 700; color: #059669; background: #ECFDF5; padding: 6px 14px; border-radius: 20px; border: 1px solid #A7F3D0;">
+                <i class="fa-solid fa-user-check"></i> Department of <?=htmlspecialchars($student_dept)?>
+            </div>
+        </div>
+
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-header-title">
@@ -600,15 +608,12 @@ body { background-color: #F8FAFC; color: #1E293B; display: flex; min-height: 100
                     <i class="fa-solid fa-calendar-days"></i>
                 </div>
                 <div>
-                    <h2>III B.Sc Computer Science - Schedule</h2>
-                    <p>Academic Year 2026 - 2027 | Odd Semester | 6-Day Order Pattern</p>
+                    <h2><?=htmlspecialchars($class_info['label'])?> - Schedule</h2>
+                    <p>Department of <?=htmlspecialchars($student_dept)?> &nbsp;|&nbsp; <?=htmlspecialchars($class_info['sem'])?> &nbsp;|&nbsp; Academic Year 2026 - 2027 &nbsp;|&nbsp; Section A</p>
                 </div>
             </div>
             <div class="action-btns">
                 <button class="btn btn-print" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Schedule</button>
-                <?php if ($is_hod): ?>
-                    <button class="btn btn-approve" onclick="alert('Timetable Approved & Published Successfully!')"><i class="fa-solid fa-circle-check"></i> Approve & Publish</button>
-                <?php endif; ?>
             </div>
         </div>
 

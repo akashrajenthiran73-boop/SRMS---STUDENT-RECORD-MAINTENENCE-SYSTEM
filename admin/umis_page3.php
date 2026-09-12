@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set('display_errors', 1); 
 error_reporting(E_ALL);
 
@@ -24,27 +26,29 @@ foreach ($possible_env_paths as $path) {
 $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
 $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
 
-function callSupabase($url, $key, $method='GET', $data=null){
-    if (empty($url) || empty($key)) {
-        return [[], 0];
+if (!function_exists('callSupabase')) {
+    function callSupabase($url, $key, $method='GET', $data=null){
+        if (empty($url) || empty($key)) {
+            return [[], 0];
+        }
+        $ch = curl_init($url);
+        $headers = ["apikey: $key", "Authorization: Bearer $key"];
+        if($method == 'POST' || $method == 'PATCH'){ 
+            $headers[] = "Content-Type: application/json"; 
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method); 
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data)); 
+        }
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HTTPHEADER => $headers
+        ]);
+        $res = curl_exec($ch); 
+        $http = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
+        curl_close($ch);
+        return [json_decode($res, true), $http];
     }
-    $ch = curl_init($url);
-    $headers = ["apikey: $key", "Authorization: Bearer $key"];
-    if($method == 'POST' || $method == 'PATCH'){ 
-        $headers[] = "Content-Type: application/json"; 
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method); 
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data)); 
-    }
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
-        CURLOPT_HTTPHEADER => $headers
-    ]);
-    $res = curl_exec($ch); 
-    $http = curl_getinfo($ch, CURLINFO_HTTP_CODE); 
-    curl_close($ch);
-    return [json_decode($res, true), $http];
 }
 
 $student_id = $_GET['student_id'] ?? $_SESSION['student_id'] ?? '';
@@ -533,7 +537,7 @@ button[type="submit"]:hover {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">
@@ -701,8 +705,30 @@ button[type="submit"]:hover {
                         <div class="g"><label>65. Stream Type</label><input type="text" name="stream_type" value="<?=v('stream_type')?>"></div>
                     </div>
                     <div class="row">
-                        <div class="g"><label>66. Course Type</label><input type="text" name="course_type" value="<?=v('course_type')?>"></div>
-                        <div class="g"><label>67. Course</label><input type="text" name="course" value="<?=v('course')?>"></div>
+                        <div class="g"><label>66. Course Type</label><input type="text" name="course_type" value="<?=v('course_type', 'Regular')?>"></div>
+                        <div class="g">
+                            <label>67. Course / Department</label>
+                            <select name="course">
+                                <optgroup label="Arts & Commerce">
+                                    <option value="TAM" <?=(v('course')=='TAM')?'selected':''?>>TAM - Tamil</option>
+                                    <option value="ENG" <?=(v('course')=='ENG')?'selected':''?>>ENG - English</option>
+                                    <option value="HIST" <?=(v('course')=='HIST')?'selected':''?>>HIST - History</option>
+                                    <option value="ECO" <?=(v('course')=='ECO')?'selected':''?>>ECO - Economics</option>
+                                    <option value="COMM" <?=(v('course')=='COMM')?'selected':''?>>COMM - Commerce</option>
+                                </optgroup>
+                                <optgroup label="Science & IT">
+                                    <option value="MATH" <?=(v('course')=='MATH')?'selected':''?>>MATH - Mathematics</option>
+                                    <option value="PHY" <?=(v('course')=='PHY')?'selected':''?>>PHY - Physics</option>
+                                    <option value="CHEM" <?=(v('course')=='CHEM')?'selected':''?>>CHEM - Chemistry</option>
+                                    <option value="BOT" <?=(v('course')=='BOT')?'selected':''?>>BOT - Botany</option>
+                                    <option value="ZOO" <?=(v('course')=='ZOO')?'selected':''?>>ZOO - Zoology</option>
+                                    <option value="STAT" <?=(v('course')=='STAT')?'selected':''?>>STAT - Statistics</option>
+                                    <option value="CS" <?=(v('course')=='CS'||v('course')=='')?'selected':''?>>CS - Computer Science</option>
+                                    <option value="BCA" <?=(v('course')=='BCA')?'selected':''?>>BCA - Computer Applications</option>
+                                    <option value="IT" <?=(v('course')=='IT')?'selected':''?>>IT - Information Technology</option>
+                                </optgroup>
+                            </select>
+                        </div>
                         <div class="g"><label>68. Branch / Specialization</label><input type="text" name="specialization" value="<?=v('specialization')?>"></div>
                     </div>
                 </div>

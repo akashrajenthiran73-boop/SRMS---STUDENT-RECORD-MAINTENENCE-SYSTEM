@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -25,7 +27,7 @@ $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
 $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
 
 if(!isset($_SESSION['role']) || $_SESSION['role'] != 'HOD'){
-    header("Location: login.php"); 
+    header("Location: ../auth/login.php"); 
     exit;
 }
 
@@ -83,6 +85,31 @@ if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
     if(is_array($decoded)) {
         $umis_list = $decoded;
     }
+}
+
+require_once __DIR__ . '/../includes/college_data.php';
+$session_dept = $_SESSION['department'] ?? 'CS';
+if (empty($session_dept) || $session_dept === 'BSC') $session_dept = 'CS';
+
+$selected_year = $_GET['year'] ?? 'All';
+
+// 1. Filter by HOD Department
+if (!empty($umis_list)) {
+    $umis_list = array_filter($umis_list, function($u) use ($session_dept) {
+        $c = strtoupper($u['course'] ?? ($u['department'] ?? ''));
+        if ($session_dept === 'CS') {
+            return (strpos($c, 'CS') !== false || strpos($c, 'COMPUTER') !== false || empty($c));
+        }
+        return (strpos($c, strtoupper($session_dept)) !== false);
+    });
+}
+
+// 2. Filter by Academic Year
+if ($selected_year !== 'All' && !empty($umis_list)) {
+    $umis_list = array_filter($umis_list, function($u) use ($selected_year) {
+        $info = get_student_year_info($u);
+        return ($info['filter_tag'] === $selected_year || $info['level'] === $selected_year);
+    });
 }
 ?>
 <?php
@@ -426,11 +453,16 @@ tbody tr:hover td {
             <li><a href="umis_form_list.php" class="active"><i class="fa-solid fa-database"></i> <span>UMIS Data</span></a></li>
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-line"></i> <span>Result Analysis</span></a></li>
 
+            <li class="nav-category">College & Dept</li>
+            <li><a href="circulars.php"><i class="fa-solid fa-bullhorn"></i> <span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> <span>Events & Calendar</span></a></li>
+            <li><a href="grievances.php"><i class="fa-solid fa-headset"></i> <span>Student Grievances</span></a></li>
+
             <li class="nav-category">Department Admin</li>
             <li><a href="leave_approvals.php"><i class="fa-solid fa-clipboard-check"></i> <span>Leave Approvals</span></a></li>
             <li><a href="timetable.php"><i class="fa-solid fa-calendar-days"></i> <span>Timetable</span></a></li>
             <li><a href="send_notice.php"><i class="fa-solid fa-paper-plane"></i> <span>Send Notice</span></a></li>
-            <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></a></li>
+            <li><a href="announcements.php"><i class="fa-solid fa-bell"></i> <span>Announcements</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -452,6 +484,9 @@ tbody tr:hover td {
             <p>Review and verify University Management Information System submissions</p>
         </div>
         <div class="user-profile">
+            <span style="background: #F1F5F9; border: 1px solid #CBD5E1; color: #334155; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-building-columns" style="color:#7C3AED;"></i> B.Sc CS Dept
+            </span>
             <div class="role-badge">
                 <i class="fa-solid fa-user-shield"></i> HOD Access
             </div>
@@ -473,6 +508,17 @@ tbody tr:hover td {
                 </div>
             </div>
             <div class="header-actions">
+                <form method="GET" action="umis_form_list.php" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 12px; font-weight: 700; color: #475569;"><i class="fa-solid fa-graduation-cap" style="color: #7C3AED;"></i> Class:</span>
+                    <select name="year" onchange="this.form.submit()" style="padding: 7px 12px; border: 1.5px solid #E2E8F0; border-radius: 8px; font-size: 12.5px; font-weight: 600; outline: none; background: #FFFFFF;">
+                        <option value="All" <?=$selected_year === 'All' ? 'selected' : ''?>>All Years</option>
+                        <option value="UG_1" <?=$selected_year === 'UG_1' ? 'selected' : ''?>>UG - 1st Year (I Year)</option>
+                        <option value="UG_2" <?=$selected_year === 'UG_2' ? 'selected' : ''?>>UG - 2nd Year (II Year)</option>
+                        <option value="UG_3" <?=$selected_year === 'UG_3' ? 'selected' : ''?>>UG - 3rd Year (III Year)</option>
+                        <option value="PG_1" <?=$selected_year === 'PG_1' ? 'selected' : ''?>>PG - 1st Year (I PG)</option>
+                        <option value="PG_2" <?=$selected_year === 'PG_2' ? 'selected' : ''?>>PG - 2nd Year (II PG)</option>
+                    </select>
+                </form>
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="umisSearch" class="search-input" placeholder="Search student or ID...">
@@ -497,6 +543,7 @@ tbody tr:hover td {
                             <th>S.No</th>
                             <th>Student ID</th>
                             <th>Name</th>
+                            <th>Academic Class</th>
                             <th>Mobile</th>
                             <th>Email</th>
                             <th>Status</th>
@@ -509,6 +556,7 @@ tbody tr:hover td {
                         $clean_status = trim($raw_status, " '\"\t\n\r\0\x0B"); 
                         if(empty($clean_status)) $clean_status = 'Pending';
                         
+                        $yinfo = get_student_year_info($u);
                         $student_id = $u['student_id'] ?? '';
                         $name = $u['student_name_cert'] ?? '-';
                         $mobile = $u['mobile'] ?? '-';
@@ -525,6 +573,11 @@ tbody tr:hover td {
                                 <div class="student-avatar"><?=$initial !== '-' ? $initial : 'U'?></div>
                                 <span style="font-weight: 600; color: #0F172A;"><?=htmlspecialchars($name)?></span>
                             </div>
+                        </td>
+                        <td>
+                            <span style="background: #F3E8FF; color: #7C3AED; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 6px; border: 1px solid #E9D5FF; display: inline-flex; align-items: center; gap: 4px;">
+                                <i class="fa-solid <?=$yinfo['level'] === 'PG' ? 'fa-award' : 'fa-graduation-cap'?>"></i> <?=htmlspecialchars($yinfo['short'])?>
+                            </span>
                         </td>
                         <td style="color: #475569;"><?=htmlspecialchars($mobile)?></td>
                         <td style="color: #475569;"><?=htmlspecialchars($email)?></td>

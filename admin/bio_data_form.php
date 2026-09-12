@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -51,6 +53,12 @@ if($id){
     $decoded = json_decode($res, true);
     $data = (!empty($decoded) && is_array($decoded)) ? $decoded[0] : [];
 }
+
+require_once __DIR__ . '/../includes/college_data.php';
+$curr_yinfo = get_student_year_info($data);
+$curr_dept = $curr_yinfo['dept_code'];
+$curr_ycode = $curr_yinfo['class_code'];
+
 // 3. Handle Form Submission
 if(isset($_POST['submit'])){
     $post_data = $_POST;
@@ -82,34 +90,55 @@ if(isset($_POST['submit'])){
     
     $target_id = $_POST['id'] ?? null; 
 
-    if($target_id){
-        $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/bio_data?id=eq." . urlencode($target_id);
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
-    } else {
-        $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/bio_data";
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-    }
+    // Calculate academic year and class fields
+    $dept = strtoupper(trim($post_data['department'] ?? 'CS'));
+    $ylevel = $post_data['academic_year_level'] ?? 'UG_1';
+    $post_data['academic_year_level'] = $ylevel;
+    $post_data['degree_level'] = (strpos($ylevel, 'PG') === 0) ? 'PG' : 'UG';
+    $classes = get_department_classes($dept);
+    $post_data['academic_class'] = $classes[$ylevel]['short'] ?? ($post_data['class'] ?? 'III B.Sc');
 
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "apikey: $SUPABASE_KEY", 
-        "Authorization: Bearer $SUPABASE_KEY", 
-        "Content-Type: application/json", 
-        "Prefer: return=representation"
-    ]);
-    
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    $executeRequest = function($payload) use ($target_id, $SUPABASE_URL, $SUPABASE_KEY) {
+        if($target_id){
+            $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/bio_data?id=eq." . urlencode($target_id);
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+        } else {
+            $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/bio_data";
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_POST, 1);
+        }
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "apikey: $SUPABASE_KEY", 
+            "Authorization: Bearer $SUPABASE_KEY", 
+            "Content-Type: application/json", 
+            "Prefer: return=representation"
+        ]);
+        
+        $res = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        return [$code, $res];
+    };
+
+    list($http_code, $response) = $executeRequest($post_data);
+
+    // If Supabase schema doesn't have academic_class/academic_year_level yet, gracefully retry without them
+    if ($http_code == 400 && strpos($response, 'Could not find the') !== false) {
+        unset($post_data['academic_class']);
+        unset($post_data['academic_year_level']);
+        unset($post_data['degree_level']);
+        list($http_code, $response) = $executeRequest($post_data);
+    }
 
     if ($http_code >= 200 && $http_code < 300) {
         header("Location: bio_data.php?success=1"); 
-        exit;
+        exit; 
     } else {
         echo "<h3>Database Error (HTTP $http_code)</h3>";
         echo "<pre>". htmlspecialchars($response). "</pre>";
@@ -455,7 +484,7 @@ input:focus, textarea:focus, select:focus {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">
@@ -515,12 +544,55 @@ input:focus, textarea:focus, select:focus {
                     <div class="form-group"><label>Student Photo URL</label><input type="text" name="student_photo" value="<?php echo htmlspecialchars($data['student_photo']??''); ?>"></div>
                     <div class="form-group"><label>Parents Photo URL</label><input type="text" name="parents_photo" value="<?php echo htmlspecialchars($data['parents_photo']??''); ?>"></div>
                     <div class="grid-2">
-                        <div class="form-group"><label>Department</label><input type="text" name="department" value="<?php echo htmlspecialchars($data['department']??''); ?>"></div>
-                        <div class="form-group"><label>Class</label><input type="text" name="class" value="<?php echo htmlspecialchars($data['class']??''); ?>"></div>
+                        <div class="form-group">
+                            <label>Department</label>
+                            <select name="department" id="bio_dept_select" required onchange="syncBioClass()">
+                                <optgroup label="Arts & Commerce">
+                                    <option value="TAM" <?php echo ($curr_dept==='TAM'?'selected':''); ?>>TAM - Department of Tamil</option>
+                                    <option value="ENG" <?php echo ($curr_dept==='ENG'?'selected':''); ?>>ENG - Department of English</option>
+                                    <option value="HIST" <?php echo ($curr_dept==='HIST'?'selected':''); ?>>HIST - Department of History</option>
+                                    <option value="ECO" <?php echo ($curr_dept==='ECO'?'selected':''); ?>>ECO - Department of Economics</option>
+                                    <option value="COMM" <?php echo ($curr_dept==='COMM'?'selected':''); ?>>COMM - Department of Commerce</option>
+                                </optgroup>
+                                <optgroup label="Science & IT">
+                                    <option value="MATH" <?php echo ($curr_dept==='MATH'?'selected':''); ?>>MATH - Department of Mathematics</option>
+                                    <option value="PHY" <?php echo ($curr_dept==='PHY'?'selected':''); ?>>PHY - Department of Physics</option>
+                                    <option value="CHEM" <?php echo ($curr_dept==='CHEM'?'selected':''); ?>>CHEM - Department of Chemistry</option>
+                                    <option value="BOT" <?php echo ($curr_dept==='BOT'?'selected':''); ?>>BOT - Department of Botany</option>
+                                    <option value="ZOO" <?php echo ($curr_dept==='ZOO'?'selected':''); ?>>ZOO - Department of Zoology</option>
+                                    <option value="STAT" <?php echo ($curr_dept==='STAT'?'selected':''); ?>>STAT - Department of Statistics</option>
+                                    <option value="CS" <?php echo ($curr_dept==='CS' || empty($curr_dept)?'selected':''); ?>>CS - Department of Computer Science</option>
+                                    <option value="BCA" <?php echo ($curr_dept==='BCA'?'selected':''); ?>>BCA - Department of Computer Applications</option>
+                                    <option value="IT" <?php echo ($curr_dept==='IT'?'selected':''); ?>>IT - Department of Information Technology</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Degree Level & Academic Year</label>
+                            <select id="bio_year_select" name="academic_year_level" onchange="syncBioClass()">
+                                <option value="UG_1" <?php echo ($curr_ycode==='UG_1'?'selected':''); ?>>UG - 1st Year (I Year)</option>
+                                <option value="UG_2" <?php echo ($curr_ycode==='UG_2'?'selected':''); ?>>UG - 2nd Year (II Year)</option>
+                                <option value="UG_3" <?php echo ($curr_ycode==='UG_3' || empty($curr_ycode)?'selected':''); ?>>UG - 3rd Year (III Year)</option>
+                                <option value="PG_1" <?php echo ($curr_ycode==='PG_1'?'selected':''); ?>>PG - 1st Year (I PG)</option>
+                                <option value="PG_2" <?php echo ($curr_ycode==='PG_2'?'selected':''); ?>>PG - 2nd Year (II PG)</option>
+                            </select>
+                        </div>
                     </div>
+                    <input type="hidden" name="academic_class" id="bio_academic_class" value="<?php echo htmlspecialchars($data['academic_class'] ?? ($data['class'] ?? 'III B.Sc')); ?>">
+                    <input type="hidden" name="degree_level" id="bio_degree_level" value="<?php echo htmlspecialchars($data['degree_level'] ?? (strpos($curr_ycode, 'PG') === 0 ? 'PG' : 'UG')); ?>">
                     <div class="grid-2">
-                        <div class="form-group"><label>Academic Year</label><input type="text" name="academic_year" value="<?php echo htmlspecialchars($data['academic_year']??''); ?>"></div>
-                        <div class="form-group"><label>Tamil Registration Number</label><input type="text" name="tamil_reg_no" value="<?php echo htmlspecialchars($data['tamil_reg_no']??''); ?>"></div>
+                        <div class="form-group">
+                            <label>Class Designation</label>
+                            <input type="text" name="class" id="bio_class_input" value="<?php echo htmlspecialchars($data['class'] ?? 'III B.Sc'); ?>" placeholder="e.g. III B.Sc">
+                        </div>
+                        <div class="form-group">
+                            <label>Academic Year / Batch</label>
+                            <input type="text" name="academic_year" value="<?php echo htmlspecialchars($data['academic_year'] ?? '2024-2027'); ?>" placeholder="e.g. 2024-2027">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tamil Registration Number</label>
+                        <input type="text" name="tamil_reg_no" value="<?php echo htmlspecialchars($data['tamil_reg_no']??''); ?>" placeholder="Enter Tamil Reg Number">
                     </div>
                 </div>
 
@@ -606,7 +678,43 @@ input:focus, textarea:focus, select:focus {
 
     </div>
 
-</div>
+<script>
+function syncBioClass() {
+    const dept = document.getElementById('bio_dept_select').value;
+    const yearLevel = document.getElementById('bio_year_select').value;
+    const classInput = document.getElementById('bio_class_input');
 
+    const artsDepts = ['TAM', 'ENG', 'HIST', 'ECO'];
+    const isArts = artsDepts.includes(dept);
+    const isComm = (dept === 'COMM');
+    const isBCA  = (dept === 'BCA');
+
+    let degPrefix = 'B.Sc';
+    if (yearLevel.startsWith('PG')) {
+        if (isArts) degPrefix = 'M.A';
+        else if (isComm) degPrefix = 'M.Com';
+        else degPrefix = 'M.Sc';
+    } else {
+        if (isArts) degPrefix = 'B.A';
+        else if (isComm) degPrefix = 'B.Com';
+        else if (isBCA)  degPrefix = 'BCA';
+        else degPrefix = 'B.Sc';
+    }
+
+    let yearNum = 'III';
+    if (yearLevel === 'UG_1' || yearLevel === 'PG_1') yearNum = 'I';
+    else if (yearLevel === 'UG_2' || yearLevel === 'PG_2') yearNum = 'II';
+    else if (yearLevel === 'UG_3') yearNum = 'III';
+
+    const shortClass = `${yearNum} ${degPrefix}`;
+    classInput.value = shortClass;
+    if (document.getElementById('bio_academic_class')) {
+        document.getElementById('bio_academic_class').value = shortClass;
+    }
+    if (document.getElementById('bio_degree_level')) {
+        document.getElementById('bio_degree_level').value = yearLevel.startsWith('PG') ? 'PG' : 'UG';
+    }
+}
+</script>
 </body>
 </html>

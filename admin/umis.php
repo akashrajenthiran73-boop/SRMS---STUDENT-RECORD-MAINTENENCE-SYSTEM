@@ -1,10 +1,12 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-if(!isset($_SESSION['role']) || $_SESSION['role'] != 'Super Admin'){ 
-    header("Location: login.php"); 
+if(!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['Admin', 'Super Admin'])){ 
+    header("Location: ../auth/login.php"); 
     exit;
 }
 
@@ -57,6 +59,31 @@ if($code1 != 200){
     $umis_list = []; 
     $error_msg = "UMIS API Error $code1: " . htmlspecialchars($raw1); 
 }
+
+require_once __DIR__ . '/../includes/college_data.php';
+$departments = get_all_departments();
+$selected_dept = $_GET['dept'] ?? 'All';
+$selected_year = $_GET['year'] ?? 'All';
+
+// 1. Filter by Department
+if ($selected_dept !== 'All' && !empty($umis_list)) {
+    $umis_list = array_filter($umis_list, function($u) use ($selected_dept) {
+        $c = strtoupper($u['course'] ?? ($u['department'] ?? ''));
+        if ($selected_dept === 'CS') {
+            return (strpos($c, 'CS') !== false || strpos($c, 'COMPUTER') !== false || empty($c));
+        }
+        return (strpos($c, strtoupper($selected_dept)) !== false);
+    });
+}
+
+// 2. Filter by Academic Year
+if ($selected_year !== 'All' && !empty($umis_list)) {
+    $umis_list = array_filter($umis_list, function($u) use ($selected_year) {
+        $info = get_student_year_info($u);
+        return ($info['filter_tag'] === $selected_year || $info['level'] === $selected_year);
+    });
+}
+
 
 $new_gen_id = 'STU' . rand(1000, 9999);
 ?>
@@ -454,7 +481,7 @@ td {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">
@@ -466,11 +493,18 @@ td {
             <li><a href="result_analysis.php"><i class="fa-solid fa-chart-pie"></i> <span>Result Analysis</span></a></li>
 
             <hr class="menu-divider">
+            <div class="menu-heading">College Operations</div>
+            <li><a href="manage_departments.php"><i class="fa-solid fa-building-columns"></i> <span>Manage Departments</span></a></li>
+            <li><a href="circulars.php"><i class="fa-solid fa-envelope-open-text"></i> <span>Circulars & Notices</span></a></li>
+            <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> <span>Academic Events</span></a></li>
+            <li><a href="grievances.php"><i class="fa-solid fa-comments"></i> <span>Student Grievances</span></a></li>
+
+            <hr class="menu-divider">
             <div class="menu-heading">Admin Panel</div>
             <li><a href="manage_users.php"><i class="fa-solid fa-users-gear"></i> <span>Manage Users</span></a></li>
             <li><a href="announcements.php"><i class="fa-solid fa-bullhorn"></i> <span>Announcements</span></a></li>
             <li><a href="backup.php"><i class="fa-solid fa-database"></i> <span>Backup & Restore</span></a></li>
-            <li><a href="reports.php"><i class="fa-solid fa-file-lines"></i> <span>Reports</span></a></li>
+            <li><a href="reports.php"><i class="fa-solid fa-chart-line"></i> <span>Reports</span></a></li>
             <li><a href="support.php"><i class="fa-solid fa-circle-question"></i> <span>Help & Support</span></a></li>
         </ul>
     </div>
@@ -495,6 +529,41 @@ td {
 
     <div class="content-body">
         
+        <!-- DUAL FILTER BAR: DEPARTMENT & ACADEMIC YEAR -->
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <form method="GET" action="umis.php" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <span style="font-size: 13px; font-weight: 700; color: #475569;"><i class="fa-solid fa-filter" style="color: #2563EB;"></i> Department:</span>
+                <select name="dept" onchange="this.form.submit()" style="padding: 8px 14px; border: 1.5px solid #E2E8F0; border-radius: 8px; font-size: 13px; font-weight: 600; outline: none; background: #F8FAFC;">
+                    <option value="All" <?php echo $selected_dept === 'All' ? 'selected' : ''; ?>>All Departments</option>
+                    <?php foreach ($departments as $d): ?>
+                        <option value="<?php echo $d['code']; ?>" <?php echo $selected_dept === $d['code'] ? 'selected' : ''; ?>>
+                            <?php echo $d['code'] . ' - ' . $d['name'] . ($d['code'] === 'CS' ? ' (Active)' : ''); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <span style="font-size: 13px; font-weight: 700; color: #475569; margin-left: 6px;"><i class="fa-solid fa-graduation-cap" style="color: #2563EB;"></i> Class / Year:</span>
+                <select name="year" onchange="this.form.submit()" style="padding: 8px 14px; border: 1.5px solid #E2E8F0; border-radius: 8px; font-size: 13px; font-weight: 600; outline: none; background: #F8FAFC;">
+                    <option value="All" <?=$selected_year === 'All' ? 'selected' : ''?>>All Years & Degrees</option>
+                    <option value="UG_1" <?=$selected_year === 'UG_1' ? 'selected' : ''?>>UG - 1st Year (I Year)</option>
+                    <option value="UG_2" <?=$selected_year === 'UG_2' ? 'selected' : ''?>>UG - 2nd Year (II Year)</option>
+                    <option value="UG_3" <?=$selected_year === 'UG_3' ? 'selected' : ''?>>UG - 3rd Year (III Year)</option>
+                    <option value="PG_1" <?=$selected_year === 'PG_1' ? 'selected' : ''?>>PG - 1st Year (I M.Sc/M.A/M.Com)</option>
+                    <option value="PG_2" <?=$selected_year === 'PG_2' ? 'selected' : ''?>>PG - 2nd Year (II M.Sc/M.A/M.Com)</option>
+                </select>
+
+                <?php if ($selected_dept !== 'All' || $selected_year !== 'All'): ?>
+                    <a href="umis.php" class="btn btn-light" style="padding: 6px 12px; font-size: 12px; background: #F1F5F9; border: 1px solid #CBD5E1; color: #475569; border-radius: 6px; text-decoration: none;"><i class="fa-solid fa-xmark"></i> Clear Filters</a>
+                <?php endif; ?>
+            </form>
+            <div style="font-size: 12.5px; color: #64748B;">
+                Scope: <strong style="color: #1E40AF;"><?php echo ($selected_dept === 'All') ? 'All Depts' : ($selected_dept . ' Dept'); ?></strong>
+                <?php if ($selected_year !== 'All'): ?>
+                    &nbsp;|&nbsp; Year: <strong style="color: #7C3AED;"><?=$selected_year?></strong>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <div class="table-card">
             
             <div class="header-actions">
@@ -516,10 +585,11 @@ td {
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 60px;">S.No</th>
+                            <th style="width: 50px;">S.No</th>
                             <th>Student ID</th>
                             <th>Name</th>
-                            <th>College</th>
+                            <th>Department</th>
+                            <th>Academic Class</th>
                             <th>UMIS Status</th>
                             <th style="width: 170px;">Action</th>
                         </tr>
@@ -533,13 +603,23 @@ td {
                                 $current_status = (isset($u['is_completed']) && $u['is_completed'] == true) ? 'Completed' : 'In Progress';
                                 
                                 $student_name = $u['student_name_cert'] ?? $u['student_name_aadhaar'] ?? '-';
-                                $college_name = $u['college_name'] ?? '-';
+                                $yinfo = get_student_year_info($u);
+                                $dept = htmlspecialchars($u['course'] ?? ($u['department'] ?? 'CS'));
                         ?>
                         <tr>
                           <td style="font-weight: 600; color: #64748B;"><?=$i++?></td>
                           <td style="font-weight: 700; color: #2563EB;"><?=htmlspecialchars($stu_id)?></td>
                           <td style="font-weight: 600; color: #1E293B;"><?=htmlspecialchars($student_name)?></td>
-                          <td><?=htmlspecialchars($college_name)?></td>
+                          <td>
+                            <span style="background: #EFF6FF; color: #1D4ED8; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; display: inline-block;">
+                                <?=$dept?>
+                            </span>
+                          </td>
+                          <td>
+                            <span style="background: #F3E8FF; color: #7C3AED; font-weight: 700; font-size: 11.5px; padding: 4px 10px; border-radius: 6px; border: 1px solid #E9D5FF; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fa-solid <?=$yinfo['level'] === 'PG' ? 'fa-award' : 'fa-graduation-cap'?>"></i> <?=htmlspecialchars($yinfo['short'])?>
+                            </span>
+                          </td>
                           <td>
                             <?php if($current_status == 'Completed'): ?>
                                 <span class="status-green"><i class="fa-solid fa-check"></i> Completed</span>
@@ -558,7 +638,7 @@ td {
                             endforeach; 
                         else: 
                         ?>
-                        <tr><td colspan="6" style="text-align:center; padding: 40px; color: #64748B; font-weight: 500;">No UMIS Records Found</td></tr>
+                        <tr><td colspan="7" style="text-align:center; padding: 40px; color: #64748B; font-weight: 500;">No UMIS Records Found</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>

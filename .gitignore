@@ -1,0 +1,26 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Testing & Cache
+.phpunit.cache
+.phpunit.result.cache
+*.log
+
+# Uploaded Files (preserve directory with .gitkeep)
+uploads/students/*
+!uploads/students/.gitkeep
+student/uploads/*
+!student/uploads/.gitkeep
+
+# System & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+test_photo.jpg
+
+# Scratch directory
+scratch/
+

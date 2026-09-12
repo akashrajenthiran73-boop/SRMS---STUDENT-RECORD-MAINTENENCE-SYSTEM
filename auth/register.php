@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SRMS Registration - Arignar Anna Gov Arts College</title>
+<title>SRMS Registration - Arignar Anna Government Arts College</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -280,7 +280,7 @@ body {
   <!-- Left Branding Section -->
   <div class="brand-section">
     <div class="brand-badge"><i class="fa-solid fa-award"></i> Established 1967</div>
-    <h1>Arignar Anna Government Arts & Science College</h1>
+    <h1>Arignar Anna Government Arts College</h1>
     <p>Student Record Maintenance System (SRMS) provides secure access to academic profiles, marks, attendance, and certificates.</p>
   </div>
 
@@ -302,7 +302,31 @@ body {
       <div class="input-group">
         <select name="role" required>
           <option value="">Select Role</option>
-          <option value="Student">👨‍🎓 Student</option>
+          <option value="Student" selected>👨‍🎓 Student</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <select name="department" required>
+          <option value="">Select Department</option>
+          <optgroup label="Arts & Commerce">
+            <option value="Tamil">📜 Tamil (B.A / M.A)</option>
+            <option value="English">📚 English (B.A / M.A)</option>
+            <option value="History">🏛️ History (B.A / M.A)</option>
+            <option value="Economics">📈 Economics (B.A / M.A)</option>
+            <option value="Commerce">📊 Commerce (B.Com / M.Com)</option>
+          </optgroup>
+          <optgroup label="Science & IT">
+            <option value="Mathematics">📐 Mathematics (B.Sc / M.Sc)</option>
+            <option value="Physics">🔬 Physics (B.Sc / M.Sc)</option>
+            <option value="Chemistry">🧪 Chemistry (B.Sc / M.Sc)</option>
+            <option value="Botany">🌿 Botany (B.Sc / M.Sc)</option>
+            <option value="Zoology">🦁 Zoology (B.Sc / M.Sc)</option>
+            <option value="Statistics">📉 Statistics (B.Sc / M.Sc)</option>
+            <option value="Computer Science" selected>💻 Computer Science (B.Sc / M.Sc)</option>
+            <option value="Computer Applications">🖥️ Computer Applications (BCA)</option>
+            <option value="Information Technology">🌐 Information Technology (B.Sc / M.Sc)</option>
+          </optgroup>
         </select>
       </div>
 
@@ -327,7 +351,7 @@ body {
 
 <!-- Footer -->
 <div class="footer-note">
-    &copy; 2026 Arignar Anna Government Arts & Science College. All rights reserved.
+    &copy; 2026 Arignar Anna Government Arts College. All rights reserved.
 </div>
 
 <script>

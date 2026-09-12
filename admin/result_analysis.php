@@ -49,25 +49,49 @@ function supabaseFetch($url, $key, $endpoint) {
     return json_decode($res, true) ?? [];
 }
 
-// Fetch Students List for Admin Dropdown
-$students_list = [];
-if ($is_staff) {
-    $students_list = supabaseFetch($SUPABASE_URL, $SUPABASE_KEY, "students?select=email,name");
-}
-
-// Selected Student Filter for Admin View
+require_once __DIR__ . '/../includes/college_data.php';
+$departments = get_all_departments();
+$selected_dept = $_GET['dept'] ?? 'All';
+$selected_year = $_GET['year'] ?? 'All';
 $selected_student_email = $_GET['student_email'] ?? '';
 
 // Fetch Data from 'students' Table
 if ($is_staff) {
+    $all_students = supabaseFetch($SUPABASE_URL, $SUPABASE_KEY, "students?select=*");
+    
+    // Filter by Department
+    $raw_students = $all_students;
+    if ($selected_dept !== 'All' && !empty($raw_students)) {
+        $raw_students = array_filter($raw_students, function($s) use ($selected_dept) {
+            $c = strtoupper($s['course'] ?? '');
+            if ($selected_dept === 'CS') {
+                return (strpos($c, 'CS') !== false || strpos($c, 'COMPUTER') !== false || empty($c));
+            }
+            return (strpos($c, strtoupper($selected_dept)) !== false);
+        });
+    }
+
+    // Filter by Academic Year
+    if ($selected_year !== 'All' && !empty($raw_students)) {
+        $raw_students = array_filter($raw_students, function($s) use ($selected_year) {
+            $info = get_student_year_info($s);
+            return ($info['filter_tag'] === $selected_year || $info['level'] === $selected_year);
+        });
+    }
+
+    // Populate students dropdown from this filtered list
+    $students_list = $raw_students;
+
+    // Filter by selected specific student if chosen
     if (!empty($selected_student_email)) {
-        $raw_students = supabaseFetch($SUPABASE_URL, $SUPABASE_KEY, "students?email=eq." . urlencode($selected_student_email));
-    } else {
-        $raw_students = supabaseFetch($SUPABASE_URL, $SUPABASE_KEY, "students?select=*");
+        $raw_students = array_filter($raw_students, function($s) use ($selected_student_email) {
+            return ($s['email'] ?? '') === $selected_student_email;
+        });
     }
 } else {
     // Student View
     $raw_students = supabaseFetch($SUPABASE_URL, $SUPABASE_KEY, "students?email=eq." . urlencode($user_email));
+    $students_list = [];
 }
 
 // Process JSON Marks across Semesters (Sem 1 to Sem 8)
@@ -77,6 +101,7 @@ $sem_averages_map = [];
 foreach ($raw_students as $student) {
     $st_name  = $student['name'] ?? 'Student';
     $st_email = $student['email'] ?? '';
+    $yinfo    = get_student_year_info($student);
 
     for ($sem_num = 1; $sem_num <= 8; $sem_num++) {
         $sem_key = "sem{$sem_num}_marks";
@@ -98,13 +123,16 @@ foreach ($raw_students as $student) {
                     $grade        = $sub['grade'] ?? ($total_score >= 40 ? 'P' : 'F');
 
                     $clean_marks[] = [
-                        'student_name'  => $st_name,
-                        'student_email' => $st_email,
-                        'semester'      => $sem_num,
-                        'subject_code'  => $subject_code,
-                        'subject_name'  => $subject_name,
-                        'marks_scored'  => (int)$total_score,
-                        'grade'         => $grade
+                        'student_name'   => $st_name,
+                        'student_email'  => $st_email,
+                        'academic_class' => $yinfo['short'],
+                        'degree_level'   => $yinfo['level'],
+                        'department'     => $student['course'] ?? 'CS',
+                        'semester'       => $sem_num,
+                        'subject_code'   => $subject_code,
+                        'subject_name'   => $subject_name,
+                        'marks_scored'   => (int)$total_score,
+                        'grade'          => $grade
                     ];
 
                     $sem_averages_map[$sem_num][] = (int)$total_score;
@@ -524,7 +552,7 @@ tbody tr:hover {
 <div class="sidebar">
     <div class="sidebar-brand">
         <h2>👑 SRMS</h2>
-        <span>Arignar Anna College</span>
+        <span>Arignar Anna Government Arts College</span>
     </div>
     
     <div class="sidebar-nav-container">
@@ -535,6 +563,13 @@ tbody tr:hover {
                 <li><a href="bio_data.php"><i class="fa-solid fa-id-card"></i> <span>Bio Data</span></a></li>
                 <li><a href="umis.php"><i class="fa-solid fa-file-lines"></i> <span>UMIS Details</span></a></li>
                 <li><a href="result_analysis.php" class="active"><i class="fa-solid fa-chart-pie"></i> <span>Result Analysis</span></a></li>
+
+                <hr class="menu-divider">
+                <div class="menu-heading">College Operations</div>
+                <li><a href="manage_departments.php"><i class="fa-solid fa-building-columns"></i> <span>Manage Departments</span></a></li>
+                <li><a href="circulars.php"><i class="fa-solid fa-envelope-open-text"></i> <span>Circulars & Notices</span></a></li>
+                <li><a href="events.php"><i class="fa-solid fa-calendar-check"></i> <span>Academic Events</span></a></li>
+                <li><a href="grievances.php"><i class="fa-solid fa-comments"></i> <span>Student Grievances</span></a></li>
 
                 <hr class="menu-divider">
                 <div class="menu-heading">Admin Panel</div>
@@ -598,12 +633,37 @@ tbody tr:hover {
         <!-- FILTER -->
         <?php if ($is_staff): ?>
             <div class="card">
-                <h3><i class="fa-solid fa-filter" style="color: #2563EB;"></i> Filter Student Performance</h3>
+                <h3><i class="fa-solid fa-filter" style="color: #2563EB;"></i> Filter Academic Results & Performance</h3>
                 <form action="result_analysis.php" method="GET" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
-                    <div class="form-group" style="flex: 1; min-width: 260px; margin: 0;">
-                        <label>Select Student from Database</label>
+                    
+                    <div class="form-group" style="flex: 1; min-width: 200px; margin: 0;">
+                        <label><i class="fa-solid fa-building-columns" style="color: #2563EB;"></i> Department</label>
+                        <select name="dept" onchange="this.form.submit()">
+                            <option value="All" <?php echo $selected_dept === 'All' ? 'selected' : ''; ?>>All Departments</option>
+                            <?php foreach ($departments as $d): ?>
+                                <option value="<?php echo $d['code']; ?>" <?php echo $selected_dept === $d['code'] ? 'selected' : ''; ?>>
+                                    <?php echo $d['code'] . ' - ' . $d['name']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="flex: 1; min-width: 200px; margin: 0;">
+                        <label><i class="fa-solid fa-graduation-cap" style="color: #2563EB;"></i> Class / Year</label>
+                        <select name="year" onchange="this.form.submit()">
+                            <option value="All" <?=$selected_year === 'All' ? 'selected' : ''?>>All Years & Degrees</option>
+                            <option value="UG_1" <?=$selected_year === 'UG_1' ? 'selected' : ''?>>UG - 1st Year (I Year)</option>
+                            <option value="UG_2" <?=$selected_year === 'UG_2' ? 'selected' : ''?>>UG - 2nd Year (II Year)</option>
+                            <option value="UG_3" <?=$selected_year === 'UG_3' ? 'selected' : ''?>>UG - 3rd Year (III Year)</option>
+                            <option value="PG_1" <?=$selected_year === 'PG_1' ? 'selected' : ''?>>PG - 1st Year (I PG)</option>
+                            <option value="PG_2" <?=$selected_year === 'PG_2' ? 'selected' : ''?>>PG - 2nd Year (II PG)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="flex: 1; min-width: 240px; margin: 0;">
+                        <label><i class="fa-solid fa-user" style="color: #2563EB;"></i> Student</label>
                         <select name="student_email" onchange="this.form.submit()">
-                            <option value="">-- All Students Overview --</option>
+                            <option value="">-- All Filtered Students (<?=count($students_list)?>) --</option>
                             <?php foreach ($students_list as $s): ?>
                                 <option value="<?php echo htmlspecialchars($s['email']); ?>" <?php echo ($selected_student_email === $s['email']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($s['name']); ?> (<?php echo htmlspecialchars($s['email']); ?>)
@@ -611,8 +671,9 @@ tbody tr:hover {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <?php if (!empty($selected_student_email)): ?>
-                        <a href="result_analysis.php" class="btn-primary" style="background: #64748B;"><i class="fa-solid fa-rotate-left"></i> Reset Filter</a>
+
+                    <?php if ($selected_dept !== 'All' || $selected_year !== 'All' || !empty($selected_student_email)): ?>
+                        <a href="result_analysis.php" class="btn-primary" style="background: #64748B; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600;"><i class="fa-solid fa-rotate-left"></i> Reset Filters</a>
                     <?php endif; ?>
                 </form>
             </div>
@@ -639,13 +700,14 @@ tbody tr:hover {
         <div class="card">
             <h3><i class="fa-solid fa-list-check" style="color: #10B981;"></i> Detailed Marks Records</h3>
             <?php if (empty($clean_marks)): ?>
-                <p style="text-align: center; color: #94A3B8; padding: 30px; font-weight: 500;">No marks records found for this user.</p>
+                <p style="text-align: center; color: #94A3B8; padding: 30px; font-weight: 500;">No marks records found for this selection.</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <?php if ($is_staff): ?><th>Student Name</th><?php endif; ?>
+                                <th>Academic Class</th>
                                 <th>Semester</th>
                                 <th>Subject</th>
                                 <th>Marks Scored</th>
@@ -659,6 +721,11 @@ tbody tr:hover {
                                     <?php if ($is_staff): ?>
                                         <td><strong><?php echo htmlspecialchars($m['student_name']); ?></strong><br><small style="color: #64748B;"><?php echo htmlspecialchars($m['student_email']); ?></small></td>
                                     <?php endif; ?>
+                                    <td>
+                                        <span style="background: #F3E8FF; color: #7C3AED; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 6px; border: 1px solid #E9D5FF; display: inline-flex; align-items: center; gap: 4px;">
+                                            <i class="fa-solid <?=$m['degree_level'] === 'PG' ? 'fa-award' : 'fa-graduation-cap'?>"></i> <?=htmlspecialchars($m['academic_class'])?>
+                                        </span>
+                                    </td>
                                     <td style="font-weight: 600; color: #2563EB;">Sem <?php echo htmlspecialchars($m['semester']); ?></td>
                                     <td><strong><?php echo htmlspecialchars($m['subject_code']); ?></strong> - <?php echo htmlspecialchars($m['subject_name']); ?></td>
                                     <td><strong><?php echo htmlspecialchars($m['marks_scored']); ?></strong> / 100</td>

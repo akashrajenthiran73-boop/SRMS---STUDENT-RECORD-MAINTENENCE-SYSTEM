@@ -7,7 +7,7 @@ $remembered_email = isset($_COOKIE['remember_email']) ? $_COOKIE['remember_email
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SRMS Login Portal - Arignar Anna Gov Arts College</title>
+<title>SRMS Login Portal - Arignar Anna Government Arts College</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -419,8 +419,17 @@ body {
 <!-- Main Container -->
 <div class="main-wrapper">
     <div class="welcome-header">
-        <h1>Computer Science Department</h1>
-        <p>Select your appropriate role to proceed with secure login</p>
+        <h1>College Academic Portal</h1>
+        <p>Arignar Anna Government Arts College &bull; Student Record Maintenance System</p>
+        <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 14px;">
+            <span style="background: rgba(37, 99, 235, 0.22); border: 1px solid rgba(147, 197, 253, 0.5); color: #FFFFFF; font-size: 11.5px; font-weight: 700; padding: 5px 14px; border-radius: 20px; letter-spacing: 0.3px;"><i class="fa-solid fa-code" style="color: #60A5FA;"></i> Computer Science (B.Sc CS)</span>
+            <span style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #E2E8F0; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 20px;">BCA</span>
+            <span style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #E2E8F0; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 20px;">Mathematics</span>
+            <span style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #E2E8F0; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 20px;">Physics</span>
+            <span style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #E2E8F0; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 20px;">Chemistry</span>
+            <span style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #E2E8F0; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 20px;">Commerce</span>
+            <span style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #E2E8F0; font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 20px;">Arts & Humanities</span>
+        </div>
     </div>
 
     <div class="cards-grid">
@@ -501,7 +510,7 @@ body {
 
 <!-- Footer -->
 <div class="footer-note">
-    &copy; 2026 Arignar Anna Government Arts & Science College. All rights reserved.
+    &copy; 2026 Arignar Anna Government Arts College. All rights reserved.
 </div>
 
 <script>

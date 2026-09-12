@@ -1,11 +1,15 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+$env = [];
+if (file_exists(__DIR__ . "/../.env")) {
+    $env = @parse_ini_file(__DIR__ . "/../.env") ?: [];
+}
 
-$env = parse_ini_file(__DIR__ . "/../.env");
-
-$SUPABASE_URL = $env['SUPABASE_URL'];
-$SUPABASE_KEY = $env['SUPABASE_ANON_KEY'];
+$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? getenv('SUPABASE_URL') ?: '');
+$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? getenv('SUPABASE_ANON_KEY') ?: '');
 
 // Supabase ku curl anupuradhu common function
 function supabase_get($table, $query="") {

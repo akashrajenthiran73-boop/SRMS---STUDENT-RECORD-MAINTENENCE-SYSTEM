@@ -19,10 +19,11 @@ require_once __DIR__ . '/../includes/college_data.php';
 // 2. Department and Class resolution
 $all_departments = get_all_departments();
 $session_dept = $_SESSION['department'] ?? 'CS';
-$selected_dept = $is_admin ? ($_GET['dept'] ?? $session_dept) : $session_dept;
-if (empty($selected_dept) || $selected_dept === 'BSC') $selected_dept = 'CS';
+$raw_dept = $is_admin ? ($_GET['dept'] ?? $session_dept) : $session_dept;
+$selected_dept = normalize_dept_code($raw_dept);
 
 $available_classes = get_department_classes($selected_dept);
+
 $selected_class = $_GET['class'] ?? 'UG_3';
 if (!isset($available_classes[$selected_class])) {
     $selected_class = array_key_first($available_classes) ?: 'UG_3';

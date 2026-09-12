@@ -940,13 +940,45 @@ function create_college_event(array $eventData): string {
 // -----------------------------------------------------------------------------
 
 /**
+ * Normalizes any department code or full name into standard department code
+ */
+function normalize_dept_code(string $deptCode): string {
+    $dept = trim($deptCode);
+    $map = [
+        'COMPUTER SCIENCE'       => 'CS',
+        'B.SC CS'                => 'CS',
+        'B.SC COMPUTER SCIENCE'  => 'CS',
+        'BSC CS'                 => 'CS',
+        'BSC'                    => 'CS',
+        'CS'                     => 'CS',
+        'COMPUTER APPLICATIONS'  => 'BCA',
+        'BCA'                    => 'BCA',
+        'INFORMATION TECHNOLOGY' => 'IT',
+        'IT'                     => 'IT',
+        'TAMIL'                  => 'TAM',
+        'ENGLISH'                => 'ENG',
+        'MATHEMATICS'            => 'MATH',
+        'PHYSICS'                => 'PHY',
+        'CHEMISTRY'              => 'CHEM',
+        'COMMERCE'               => 'COMM',
+        'ECONOMICS'              => 'ECO',
+        'HISTORY'                => 'HIST',
+        'BOTANY'                 => 'BOT',
+        'ZOOLOGY'                => 'ZOO',
+        'STATISTICS'             => 'STAT'
+    ];
+    $upper = strtoupper($dept);
+    return $map[$upper] ?? ($upper ?: 'CS');
+}
+
+/**
  * Returns available classes/degrees for a given department
  */
 function get_department_classes(string $deptCode): array {
-    $code = strtoupper(trim($deptCode));
-    if (empty($code)) $code = 'CS';
+    $code = normalize_dept_code($deptCode);
 
     switch ($code) {
+
         // Arts & Commerce Departments (5)
         case 'TAM':
             $classes = [
@@ -1263,8 +1295,7 @@ function get_default_class_timetable(string $deptCode, string $classCode): array
  */
 function get_class_timetable(string $deptCode, string $classCode = 'UG_3'): array {
     global $SUPABASE_URL, $SUPABASE_KEY;
-    $dept = strtoupper(trim($deptCode));
-    if (empty($dept)) $dept = 'CS';
+    $dept = normalize_dept_code($deptCode);
     $class = trim($classCode);
     if (empty($class)) $class = 'UG_3';
     $key = "{$dept}_{$class}";
@@ -1272,23 +1303,22 @@ function get_class_timetable(string $deptCode, string $classCode = 'UG_3'): arra
     $store = read_college_store();
     $timetables = $store['timetables'] ?? [];
 
-    if (isset($timetables[$key]) && is_array($timetables[$key]) && !empty($timetables[$key])) {
-        return $timetables[$key];
-    }
-
-    // If CS_UG_3, check Supabase real-time timetable table
-    if ($dept === 'CS' && $class === 'UG_3' && !empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
-        $fetch_url = rtrim($SUPABASE_URL, '/') . "/rest/v1/timetable?select=*&order=day_order,hour_slot";
+    // Check Supabase real-time timetable table filtered by class_code
+    if ($dept === 'CS' && !empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
+        $fetch_url = rtrim($SUPABASE_URL, '/') . "/rest/v1/timetable?class_code=eq." . urlencode($class) . "&order=day_order,hour_slot";
         $ch = curl_init($fetch_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "apikey: $SUPABASE_KEY",
             "Authorization: Bearer $SUPABASE_KEY"
         ]);
         $db_response = curl_exec($ch);
+        $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         $db_data = json_decode($db_response, true);
-        if (is_array($db_data) && !empty($db_data)) {
+        if ($http >= 200 && $http < 300 && is_array($db_data) && !empty($db_data)) {
             $db_timetable = ['I' => [], 'II' => [], 'III' => [], 'IV' => [], 'V' => [], 'VI' => []];
             foreach ($db_data as $row) {
                 $day = $row['day_order'];
@@ -1313,6 +1343,10 @@ function get_class_timetable(string $deptCode, string $classCode = 'UG_3'): arra
         }
     }
 
+    if (isset($timetables[$key]) && is_array($timetables[$key]) && !empty($timetables[$key])) {
+        return $timetables[$key];
+    }
+
     $default = get_default_class_timetable($dept, $class);
     if (!isset($store['timetables'])) $store['timetables'] = [];
     $store['timetables'][$key] = $default;
@@ -1325,8 +1359,7 @@ function get_class_timetable(string $deptCode, string $classCode = 'UG_3'): arra
  */
 function save_class_timetable_slot(string $deptCode, string $classCode, string $day, int $hour, string $subject, int $span = 1): bool {
     global $SUPABASE_URL, $SUPABASE_KEY;
-    $dept = strtoupper(trim($deptCode));
-    if (empty($dept)) $dept = 'CS';
+    $dept = normalize_dept_code($deptCode);
     $class = trim($classCode);
     if (empty($class)) $class = 'UG_3';
     $key = "{$dept}_{$class}";
@@ -1363,20 +1396,24 @@ function save_class_timetable_slot(string $deptCode, string $classCode, string $
     $store['timetables'][$key] = $schedule;
     $saved = write_college_store($store);
 
-    // If updating CS_UG_3, synchronize to Supabase timetable table
-    if ($dept === 'CS' && $class === 'UG_3' && !empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
+    // Synchronize to Supabase timetable table
+    if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
         $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/timetable?on_conflict=day_order,hour_slot";
         $payload = json_encode([
-            'day_order' => $day,
-            'hour_slot' => (int)$hour,
+            'day_order'    => $day,
+            'hour_slot'    => (int)$hour,
             'subject_code' => $subject,
-            'colspan' => (int)$span,
-            'department' => 'B.Sc CS'
+            'colspan'      => (int)$span,
+            'department'   => 'B.Sc CS',
+            'class_code'   => $class,
+            'updated_at'   => date('c')
         ]);
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "apikey: $SUPABASE_KEY",
             "Authorization: Bearer $SUPABASE_KEY",

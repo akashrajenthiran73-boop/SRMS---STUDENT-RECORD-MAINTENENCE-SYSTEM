@@ -17,21 +17,8 @@ require_once __DIR__ . '/../includes/college_data.php';
 
 // 2. Department and Class resolution for Student
 $raw_dept = $_SESSION['department'] ?? 'CS';
-$student_dept = 'CS';
-$up = strtoupper($raw_dept);
-if (strpos($up, 'MATH') !== false) $student_dept = 'MATH';
-elseif (strpos($up, 'BCA') !== false || strpos($up, 'APPLICATION') !== false) $student_dept = 'BCA';
-elseif (strpos($up, 'PHY') !== false) $student_dept = 'PHY';
-elseif (strpos($up, 'CHEM') !== false) $student_dept = 'CHEM';
-elseif (strpos($up, 'BOT') !== false) $student_dept = 'BOT';
-elseif (strpos($up, 'ZOO') !== false) $student_dept = 'ZOO';
-elseif (strpos($up, 'STAT') !== false) $student_dept = 'STAT';
-elseif (strpos($up, 'COMM') !== false) $student_dept = 'COMM';
-elseif (strpos($up, 'HIST') !== false) $student_dept = 'HIST';
-elseif (strpos($up, 'ECO') !== false) $student_dept = 'ECO';
-elseif (strpos($up, 'ENG') !== false) $student_dept = 'ENG';
-elseif (strpos($up, 'TAM') !== false) $student_dept = 'TAM';
-elseif (strpos($up, 'INFO') !== false || strpos($up, ' IT') !== false || $up === 'IT') $student_dept = 'IT';
+$student_dept = normalize_dept_code($raw_dept);
+
 
 $available_classes = get_department_classes($student_dept);
 

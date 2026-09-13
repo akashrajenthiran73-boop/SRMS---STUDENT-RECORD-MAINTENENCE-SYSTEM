@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -10,29 +12,45 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once __DIR__ . '/../includes/college_data.php';
 
-$student_name = $_SESSION['name'] ?? $_SESSION['username'] ?? 'Student';
-$reg_no = $_SESSION['reg_no'] ?? 'REG-N/A';
-$dept_code = 'CS'; // Core active department
+$student_name = $_SESSION['name'] ?? ($_SESSION['username'] ?? 'Student');
+$reg_no = $_SESSION['reg_no'] ?? ($_SESSION['exam_reg_no'] ?? 'REG-N/A');
+$dept_name = $_SESSION['department'] ?? 'Computer Science';
+
+// Department code detection
+$dept_code = 'CS';
+if (preg_match('/tamil/i', $dept_name)) $dept_code = 'TAM';
+elseif (preg_match('/english/i', $dept_name)) $dept_code = 'ENG';
+elseif (preg_match('/math/i', $dept_name)) $dept_code = 'MATH';
+elseif (preg_match('/phys/i', $dept_name)) $dept_code = 'PHY';
+elseif (preg_match('/chem/i', $dept_name)) $dept_code = 'CHEM';
+elseif (preg_match('/botan/i', $dept_name)) $dept_code = 'BOT';
+elseif (preg_match('/zool/i', $dept_name)) $dept_code = 'ZOO';
+elseif (preg_match('/comm/i', $dept_name)) $dept_code = 'COMM';
+elseif (preg_match('/econ/i', $dept_name)) $dept_code = 'ECO';
+elseif (preg_match('/hist/i', $dept_name)) $dept_code = 'HIST';
+elseif (preg_match('/bca/i', $dept_name)) $dept_code = 'BCA';
+elseif (preg_match('/it|information/i', $dept_name)) $dept_code = 'IT';
+elseif (!empty($dept_name) && strlen($dept_name) <= 5) $dept_code = strtoupper($dept_name);
 
 $all_circulars = get_college_circulars();
-$categories = get_circular_categories();
+$categories = function_exists('get_circular_categories') ? get_circular_categories() : ['Academic', 'Examination', 'Exam', 'Scholarship', 'Events', 'Holiday', 'General'];
 
-// Filter for students: Show circulars targeted to 'ALL' or 'CS'
-$student_circulars = array_filter($all_circulars, function($c) use ($dept_code) {
-    $target = $c['dept_code'] ?? 'ALL';
-    return ($target === 'ALL' || $target === $dept_code);
+// Filter for students: Show circulars targeted to 'All' or student's department
+$student_circulars = array_filter($all_circulars, function($c) use ($dept_code, $dept_name) {
+    $target = trim($c['target_dept'] ?? ($c['dept_code'] ?? 'All'));
+    return (empty($target) || strcasecmp($target, 'All') === 0 || strcasecmp($target, $dept_code) === 0 || strcasecmp($target, $dept_name) === 0);
 });
 
 // Category and search filter
-$category_filter = $_GET['category'] ?? '';
+$category_filter = trim($_GET['category'] ?? '');
 $search_query = trim($_GET['search'] ?? '');
 
 $filtered_circulars = array_filter($student_circulars, function($c) use ($category_filter, $search_query) {
-    if ($category_filter !== '' && ($c['category'] ?? '') !== $category_filter) {
+    if ($category_filter !== '' && strcasecmp($c['category'] ?? '', $category_filter) !== 0) {
         return false;
     }
     if ($search_query !== '') {
-        $text = ($c['title'] ?? '') . ' ' . ($c['reference_no'] ?? '') . ' ' . ($c['content'] ?? '');
+        $text = ($c['title'] ?? '') . ' ' . ($c['reference_no'] ?? '') . ' ' . ($c['ref_no'] ?? '') . ' ' . ($c['content'] ?? '') . ' ' . ($c['summary'] ?? '');
         if (stripos($text, $search_query) === false) {
             return false;
         }
@@ -138,10 +156,11 @@ $filtered_circulars = array_filter($student_circulars, function($c) use ($catego
             border-radius: 20px; letter-spacing: 0.4px;
         }
         .cat-academic { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
-        .cat-exam { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+        .cat-exam, .cat-examination { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
         .cat-holiday { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
         .cat-general { background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
-        .cat-fee { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+        .cat-fee, .cat-scholarship { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+        .cat-event, .cat-events { background: #F3E8FF; color: #7C3AED; border: 1px solid #DDD6FE; }
 
         .circular-title { font-size: 15.5px; font-weight: 700; color: #0F172A; margin-bottom: 8px; line-height: 1.4; }
         .circular-snippet {
@@ -247,7 +266,7 @@ $filtered_circulars = array_filter($student_circulars, function($c) use ($catego
         </div>
         <div class="user-profile">
             <span style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1D4ED8; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;">
-                <i class="fa-solid fa-building-columns"></i> B.Sc CS Dept
+                <i class="fa-solid fa-building-columns"></i> <?=htmlspecialchars($dept_name)?>
             </span>
             <div class="role-badge">
                 <i class="fa-solid fa-graduation-cap"></i> Student
@@ -301,23 +320,27 @@ $filtered_circulars = array_filter($student_circulars, function($c) use ($catego
             <div class="circular-list">
                 <?php foreach ($filtered_circulars as $c): 
                     $cat = $c['category'] ?? 'General';
-                    $cat_class = 'cat-' . strtolower($cat);
-                    $target = ($c['dept_code'] ?? 'ALL') === 'ALL' ? 'College-Wide' : 'Computer Science';
+                    $cat_class = 'cat-' . strtolower(preg_replace('/[^a-z0-9]/i', '', $cat));
+                    $target = trim($c['target_dept'] ?? ($c['dept_code'] ?? 'All'));
+                    $target_label = (empty($target) || strcasecmp($target, 'All') === 0) ? 'College-Wide' : htmlspecialchars($target);
+                    $date_val = $c['publish_date'] ?? ($c['issued_date'] ?? ($c['date'] ?? date('Y-m-d')));
+                    $ref_val = $c['reference_no'] ?? ($c['ref_no'] ?? 'OFFICIAL');
+                    $summary_val = !empty($c['summary']) ? $c['summary'] : ($c['content'] ?? '');
                 ?>
                     <div class="circular-card">
                         <div>
                             <div class="card-meta">
                                 <span class="cat-badge <?=$cat_class?>"><?=htmlspecialchars($cat)?></span>
                                 <span style="font-size: 11px; font-weight: 600; color: #64748B;">
-                                    <i class="fa-solid fa-shield-halved" style="color:#059669;"></i> <?=$target?>
+                                    <i class="fa-solid fa-shield-halved" style="color:#059669;"></i> <?=$target_label?>
                                 </span>
                             </div>
                             <h3 class="circular-title"><?=htmlspecialchars($c['title'] ?? 'Notice')?></h3>
-                            <p class="circular-snippet"><?=htmlspecialchars($c['content'] ?? '')?></p>
+                            <p class="circular-snippet"><?=htmlspecialchars($summary_val)?></p>
                         </div>
                         <div class="card-footer">
                             <div>
-                                <i class="fa-regular fa-calendar" style="margin-right: 4px;"></i> <?=htmlspecialchars($c['issued_date'] ?? date('Y-m-d'))?>
+                                <i class="fa-regular fa-calendar" style="margin-right: 4px;"></i> <?=htmlspecialchars($date_val)?>
                             </div>
                             <button type="button" class="btn-view-circ" onclick='openModal(<?=json_encode($c)?>)'>
                                 <i class="fa-solid fa-eye"></i> Read Notice
@@ -357,14 +380,16 @@ $filtered_circulars = array_filter($student_circulars, function($c) use ($catego
 <script>
 function openModal(data) {
     document.getElementById('mTitle').innerText = data.title || 'Circular';
-    document.getElementById('mRef').innerText = data.reference_no || 'OFFICIAL';
-    document.getElementById('mDate').innerText = data.issued_date || '<?=date('Y-m-d')?>';
-    document.getElementById('mScope').innerText = (data.dept_code === 'ALL' || !data.dept_code) ? 'College-Wide' : 'Department of Computer Science';
-    document.getElementById('mContent').innerText = data.content || '';
+    document.getElementById('mRef').innerText = data.reference_no || data.ref_no || 'OFFICIAL';
+    document.getElementById('mDate').innerText = data.publish_date || data.issued_date || '<?=date('Y-m-d')?>';
+    var target = data.target_dept || data.dept_code || 'All';
+    document.getElementById('mScope').innerText = (target.toLowerCase() === 'all') ? 'All Departments (College-Wide)' : target;
+    document.getElementById('mContent').innerText = data.content || data.summary || 'No details provided.';
     
+    var cat = data.category || 'General';
     const catSpan = document.getElementById('mCategory');
-    catSpan.innerText = data.category || 'General';
-    catSpan.className = 'cat-badge cat-' + (data.category ? data.category.toLowerCase() : 'general');
+    catSpan.innerText = cat;
+    catSpan.className = 'cat-badge cat-' + cat.toLowerCase().replace(/[^a-z0-9]/g, '');
     
     document.getElementById('circModal').classList.add('active');
 }

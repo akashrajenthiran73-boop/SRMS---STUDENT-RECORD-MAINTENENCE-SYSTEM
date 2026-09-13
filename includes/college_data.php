@@ -623,6 +623,18 @@ function get_circular_by_id(string $id): ?array {
     return null;
 }
 
+function get_circular_categories(): array {
+    $defaults = ['Academic', 'Examination', 'Exam', 'Scholarship', 'Events', 'Holiday', 'General'];
+    $circulars = get_college_circulars();
+    $found = [];
+    foreach ($circulars as $c) {
+        if (!empty($c['category'])) {
+            $found[] = trim($c['category']);
+        }
+    }
+    return array_values(array_unique(array_merge($defaults, $found)));
+}
+
 function save_circular(array $cirData): bool {
     $store = read_college_store();
     $id = $cirData['id'] ?? ('cir_' . time() . '_' . rand(100, 999));

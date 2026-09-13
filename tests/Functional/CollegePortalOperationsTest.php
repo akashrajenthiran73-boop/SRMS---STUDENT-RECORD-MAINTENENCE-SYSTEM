@@ -5,13 +5,17 @@ use PHPUnit\Framework\TestCase;
 
 use function get_college_departments;
 use function create_college_department;
+use function delete_department;
 use function create_college_circular;
 use function get_college_circulars;
+use function delete_circular;
 use function create_college_event;
 use function get_college_events;
+use function delete_event;
 use function submit_student_grievance;
 use function get_student_grievances;
 use function update_grievance_status;
+use function delete_grievance;
 use function get_department_classes;
 use function get_student_year_info;
 use function get_class_timetable;
@@ -60,6 +64,7 @@ class CollegePortalOperationsTest extends TestCase {
             }
         }
         $this->assertTrue($found, "New department should be retrievable from store");
+        delete_department($testCode);
     }
 
     public function testCircularCreationAndFiltering(): void {
@@ -87,6 +92,7 @@ class CollegePortalOperationsTest extends TestCase {
             }
         }
         $this->assertTrue($found, "Created circular must be found in circulars list");
+        delete_circular($circId);
     }
 
     public function testEventCreationAndRetrieval(): void {
@@ -113,6 +119,7 @@ class CollegePortalOperationsTest extends TestCase {
             }
         }
         $this->assertTrue($found, "Created event must be found in events list");
+        delete_event($eventId);
     }
 
     public function testStudentGrievanceLifecycle(): void {
@@ -145,6 +152,7 @@ class CollegePortalOperationsTest extends TestCase {
         $updatedList = get_student_grievances('All', $testStudentId);
         $this->assertEquals('Resolved', $updatedList[0]['status']);
         $this->assertEquals('Marks verified and updated in portal.', $updatedList[0]['admin_reply']);
+        delete_grievance($grvId);
     }
 
     public function testDepartmentClassesListing(): void {

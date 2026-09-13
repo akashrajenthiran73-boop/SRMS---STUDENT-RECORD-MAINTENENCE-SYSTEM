@@ -40,3 +40,8 @@ if (file_exists(__DIR__ . '/../src/Database/Exceptions.php')) {
 if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     @session_start();
 }
+
+// 5. Test Isolation: Use isolated test store file during automated tests
+if (!defined('COLLEGE_STORE_FILE')) {
+    define('COLLEGE_STORE_FILE', __DIR__ . '/../data/test_college_store.json');
+}

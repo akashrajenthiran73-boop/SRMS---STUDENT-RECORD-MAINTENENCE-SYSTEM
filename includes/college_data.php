@@ -258,78 +258,7 @@ function init_college_default_store() {
                 'description' => 'Network architecture, cloud infrastructure, cybersecurity, and enterprise systems engineering.'
             ]
         ],
-        'circulars' => [
-            [
-                'id' => 'cir_101',
-                'ref_no' => 'AAGAC/CIR/2026/048',
-                'title' => 'End Semester University Theory & Practical Examinations Schedule',
-                'category' => 'Examination',
-                'target_dept' => 'All',
-                'priority' => 'High',
-                'publish_date' => '2026-09-08',
-                'published_by' => 'Controller of Examinations / Principal Office',
-                'summary' => 'Timetable and hall ticket issuance for the upcoming November/December 2026 University Examinations.',
-                'content' => "All Heads of Departments and students are hereby informed that the End Semester University Examinations (Theory and Practicals) are scheduled to commence shortly. Practical examinations will begin from October 15th, 2026. Hall tickets can be collected from the respective HOD offices after verifying attendance eligibility (minimum 75% mandatory).",
-                'attachment' => 'exam_schedule_2026.pdf',
-                'status' => 'Published'
-            ],
-            [
-                'id' => 'cir_102',
-                'ref_no' => 'AAGAC/CIR/2026/045',
-                'title' => 'Post-Matric Scholarship & Higher Education Special Incentive Scheme Renewal',
-                'category' => 'Scholarship',
-                'target_dept' => 'All',
-                'priority' => 'Normal',
-                'publish_date' => '2026-09-05',
-                'published_by' => 'College Scholarship Section',
-                'summary' => 'Last date for submission of renewal applications for BC/MBC/SC/ST state scholarships.',
-                'content' => "Eligible students belonging to SC/ST/SCC/BC/MBC/DNC categories are instructed to submit their renewal scholarship forms along with updated income certificate, bank passbook copy, and fee receipts to the college scholarship counter on or before September 25, 2026.",
-                'attachment' => 'scholarship_guidelines.pdf',
-                'status' => 'Published'
-            ],
-            [
-                'id' => 'cir_103',
-                'ref_no' => 'AAGAC/CIR/2026/041',
-                'title' => 'CYBERFEST 2026 - State Level Inter-Collegiate Technical Symposium',
-                'category' => 'Events',
-                'target_dept' => 'CS',
-                'priority' => 'Urgent',
-                'publish_date' => '2026-09-03',
-                'published_by' => 'Department of Computer Science',
-                'summary' => 'Annual National/State technical fest hosting Coding, Web Design, Paper Presentation, and Debugging events.',
-                'content' => "The Department of Computer Science is proud to organize 'CYBERFEST 2026', a prestigious State-Level Technical Symposium on September 28, 2026. Students from all CS/IT departments across Tamil Nadu colleges will be participating. CS students are requested to coordinate with student coordinators for registration and event preparations.",
-                'attachment' => 'cyberfest_brouchure.pdf',
-                'status' => 'Published'
-            ],
-            [
-                'id' => 'cir_104',
-                'ref_no' => 'AAGAC/CIR/2026/039',
-                'title' => 'Declaration of Local Holiday on Account of District Festival',
-                'category' => 'Holiday',
-                'target_dept' => 'All',
-                'priority' => 'Normal',
-                'publish_date' => '2026-08-28',
-                'published_by' => 'Principal Office',
-                'summary' => 'College will remain closed on Friday. Compensatory working day announced.',
-                'content' => "As per the notification from the District Collector, Villupuram, the college will remain closed on Friday on account of the annual district car festival. The compensatory working day will be observed on the subsequent second Saturday.",
-                'attachment' => '',
-                'status' => 'Published'
-            ],
-            [
-                'id' => 'cir_105',
-                'ref_no' => 'AAGAC/CIR/2026/035',
-                'title' => 'Continuous Internal Assessment (CIA-2) Test Schedule Announced',
-                'category' => 'Academic',
-                'target_dept' => 'All',
-                'priority' => 'High',
-                'publish_date' => '2026-08-20',
-                'published_by' => 'Academic Council / HOD Committee',
-                'summary' => 'CIA-2 tests for all UG and PG classes scheduled from September 18th to 23rd.',
-                'content' => "The second Continuous Internal Assessment (CIA-2) tests for all undergraduate and postgraduate students will be conducted from September 18th to 23rd, 2026. Faculty members are requested to submit question papers in the standard format to the exam committee by September 12th.",
-                'attachment' => 'cia2_timetable.pdf',
-                'status' => 'Published'
-            ]
-        ],
+        'circulars' => [],
         'events' => [
             [
                 'id' => 'ev_201',
@@ -577,6 +506,16 @@ function save_department(array $deptData): bool {
         supabase_college_call('college_departments', 'POST', $targetDept);
     }
 
+    return write_college_store($store);
+}
+
+function delete_department(string $code): bool {
+    $store = read_college_store();
+    $code = strtoupper(trim($code));
+    $store['departments'] = array_values(array_filter($store['departments'] ?? [], function($d) use ($code) {
+        return strtoupper($d['code'] ?? '') !== $code;
+    }));
+    supabase_college_call('college_departments?code=eq.' . urlencode($code), 'DELETE');
     return write_college_store($store);
 }
 
@@ -890,6 +829,15 @@ function update_grievance_status(string $id, string $status, string $adminReply 
     }
 
     return $updated ? write_college_store($store) : false;
+}
+
+function delete_grievance(string $id): bool {
+    $store = read_college_store();
+    $store['grievances'] = array_values(array_filter($store['grievances'] ?? [], function($g) use ($id) {
+        return ($g['id'] ?? '') !== $id;
+    }));
+    supabase_college_call('college_grievances?id=eq.' . urlencode($id), 'DELETE');
+    return write_college_store($store);
 }
 
 // -----------------------------------------------------------------------------

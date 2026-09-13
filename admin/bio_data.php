@@ -30,12 +30,11 @@ foreach ($possible_env_paths as $path) {
     }
 }
 
-$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
-$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
+$DEFAULT_SUPABASE_URL = 'https://edwndgdjzjevbgdliuxy.supabase.co';
+$DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkd25kZ2RqempldmJnZGxpdXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDg1ODgsImV4cCI6MjEwMDgyNDU4OH0.yvqU6cT-xbbLezB4PaXd3lufrfdzN2OwnVzOO7new_c';
 
-if (empty($SUPABASE_URL) || empty($SUPABASE_KEY)) {
-    die("Configuration Error: SUPABASE_URL or SUPABASE_ANON_KEY missing in .env file!");
-}
+$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? (getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? ($GLOBALS['SUPABASE_URL'] ?? $DEFAULT_SUPABASE_URL))));
+$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? (getenv('SUPABASE_ANON_KEY') ?: ($_ENV['SUPABASE_ANON_KEY'] ?? ($GLOBALS['SUPABASE_KEY'] ?? $DEFAULT_SUPABASE_KEY))));
 
 $bio_data_list = [];
 $error = "";

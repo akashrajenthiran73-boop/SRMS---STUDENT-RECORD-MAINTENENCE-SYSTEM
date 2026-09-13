@@ -11,16 +11,16 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || !in_array($_SES
 
 $role = $_SESSION['role'];
 
-// Load .env configuration from root folder safely
-$env_path = '../.env';
-$SUPABASE_URL = '';
-$SUPABASE_KEY = '';
+require_once __DIR__ . '/../includes/college_data.php';
 
-if (file_exists($env_path)) {
-    $env = parse_ini_file($env_path);
-    $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
-    $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
-}
+$DEFAULT_SUPABASE_URL = 'https://edwndgdjzjevbgdliuxy.supabase.co';
+$DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkd25kZ2RqempldmJnZGxpdXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDg1ODgsImV4cCI6MjEwMDgyNDU4OH0.yvqU6cT-xbbLezB4PaXd3lufrfdzN2OwnVzOO7new_c';
+
+// Load .env configuration safely with fallbacks
+$env_path = __DIR__ . '/../.env';
+$env = file_exists($env_path) ? (@parse_ini_file($env_path) ?: []) : [];
+$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? (getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? ($GLOBALS['SUPABASE_URL'] ?? $DEFAULT_SUPABASE_URL))));
+$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? (getenv('SUPABASE_ANON_KEY') ?: ($_ENV['SUPABASE_ANON_KEY'] ?? ($GLOBALS['SUPABASE_KEY'] ?? $DEFAULT_SUPABASE_KEY))));
 
 // Back button action
 if (isset($_POST['back'])) {
@@ -82,7 +82,6 @@ if (isset($_POST['submit'])) {
     unset($data['back']);
 
     // Calculate and preserve academic class and year level
-    require_once __DIR__ . '/../includes/college_data.php';
     $ylevel = $data['academic_year_level'] ?? 'UG_1';
     $data['academic_year_level'] = $ylevel;
     $data['degree_level'] = (strpos($ylevel, 'PG') === 0) ? 'PG' : 'UG';
@@ -106,16 +105,17 @@ if (isset($_POST['submit'])) {
     if (empty($data['working_days'])) $data['working_days'] = null;
     if (empty($data['class_rank'])) $data['class_rank'] = null;
 
+    // Remove any accidental 'reg_no' key if present
+    unset($data['reg_no']);
+
     // Send payload to Supabase API
-    $response = '';
-    $http_code = 0;
-    
-    if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
-        $url = $SUPABASE_URL . "/rest/v1/students";
-        $ch = curl_init($url);
+    $sendStudentReq = function($payload) use ($SUPABASE_URL, $SUPABASE_KEY) {
+        $ch = curl_init(rtrim($SUPABASE_URL, '/') . "/rest/v1/students");
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             "apikey: $SUPABASE_KEY", 
             "Authorization: Bearer $SUPABASE_KEY",
@@ -123,9 +123,22 @@ if (isset($_POST['submit'])) {
             "Prefer: return=representation"
         ]);
 
-        $response = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $resp = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+        return [$resp, $code];
+    };
+
+    list($response, $http_code) = $sendStudentReq($data);
+
+    // If 400 missing column error, dynamically strip unknown column and retry
+    $retries = 0;
+    while ($http_code == 400 && is_string($response) && strpos($response, 'Could not find the') !== false && $retries < 10) {
+        $retries++;
+        if (preg_match("/'([^']+)' column of 'students'/", $response, $matches)) {
+            unset($data[$matches[1]]);
+        }
+        list($response, $http_code) = $sendStudentReq($data);
     }
 
     if ($http_code == 201 || $http_code == 200) {

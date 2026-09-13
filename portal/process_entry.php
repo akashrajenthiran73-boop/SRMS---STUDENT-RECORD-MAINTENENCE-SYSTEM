@@ -7,18 +7,15 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../includes/college_data.php';
 
-// Safe .env loader with fallback to getenv()
-$env_path = __DIR__ . '/../.env';
-$SUPABASE_URL = '';
-$SUPABASE_KEY = '';
+// Safe .env loader with fallback to getenv() and defaults
+$DEFAULT_SUPABASE_URL = 'https://edwndgdjzjevbgdliuxy.supabase.co';
+$DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkd25kZ2RqempldmJnZGxpdXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDg1ODgsImV4cCI6MjEwMDgyNDU4OH0.yvqU6cT-xbbLezB4PaXd3lufrfdzN2OwnVzOO7new_c';
 
-if (file_exists($env_path)) {
-    $env = @parse_ini_file($env_path) ?: [];
-    $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
-    $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
-}
-if (empty($SUPABASE_URL)) $SUPABASE_URL = trim(getenv('SUPABASE_URL') ?: '');
-if (empty($SUPABASE_KEY)) $SUPABASE_KEY = trim(getenv('SUPABASE_ANON_KEY') ?: '');
+$env_path = __DIR__ . '/../.env';
+$env = file_exists($env_path) ? (@parse_ini_file($env_path) ?: []) : [];
+
+$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? (getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? ($GLOBALS['SUPABASE_URL'] ?? $DEFAULT_SUPABASE_URL))));
+$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? (getenv('SUPABASE_ANON_KEY') ?: ($_ENV['SUPABASE_ANON_KEY'] ?? ($GLOBALS['SUPABASE_KEY'] ?? $DEFAULT_SUPABASE_KEY))));
 
 function callSupabaseApi($url, $key, $method = 'GET', $data = null) {
     if (empty($url) || empty($key)) {
@@ -50,10 +47,10 @@ function callSupabaseApi($url, $key, $method = 'GET', $data = null) {
 function safeSupabaseWrite($base_url, $table, $id_field, $id_val, $payload, $key) {
     $clean_base = rtrim($base_url, '/');
     
-    // Check if record exists
+    // Check if record exists (Must be 2xx AND return a non-empty list of rows)
     $check_url = "$clean_base/rest/v1/$table?$id_field=eq." . urlencode($id_val);
     list($existing, $chk_code) = callSupabaseApi($check_url, $key);
-    $exists = (!empty($existing) && is_array($existing));
+    $exists = ($chk_code >= 200 && $chk_code < 300 && is_array($existing) && !empty($existing) && isset($existing[0]));
 
     $sendRequest = function($p) use ($clean_base, $table, $id_field, $id_val, $exists, $key) {
         if ($exists) {
@@ -66,6 +63,12 @@ function safeSupabaseWrite($base_url, $table, $id_field, $id_val, $payload, $key
     };
 
     list($res, $code, $raw) = $sendRequest($payload);
+
+    // If PATCH was attempted but affected 0 rows (PostgREST returns 200 with [] when no rows matched), fallback to POST
+    if ($exists && $code >= 200 && $code < 300 && is_array($res) && empty($res)) {
+        $url = "$clean_base/rest/v1/$table";
+        list($res, $code, $raw) = callSupabaseApi($url, $key, 'POST', $payload);
+    }
 
     // If 409 Unique Constraint conflict (e.g. duplicate aadhaar_no, roll_no, or exam_reg_no), auto-patch existing record
     if ($code == 409 && is_string($raw) && preg_match('/Key \(([^)]+)\)=\(([^)]+)\) already exists/', $raw, $uk_match)) {
@@ -86,7 +89,17 @@ function safeSupabaseWrite($base_url, $table, $id_field, $id_val, $payload, $key
         list($res, $code, $raw) = $sendRequest($payload);
     }
 
-    return [$code >= 200 && $code < 300, $code, $raw];
+    // Final verification: If code is 200 but res is empty [], check if row actually exists
+    $is_success = ($code >= 200 && $code < 300);
+    if ($is_success && $code == 200 && is_array($res) && empty($res)) {
+        $verify_url = "$clean_base/rest/v1/$table?$id_field=eq." . urlencode($id_val);
+        list($v_existing, $v_code) = callSupabaseApi($verify_url, $key);
+        if (empty($v_existing) || !isset($v_existing[0])) {
+            $is_success = false;
+        }
+    }
+
+    return [$is_success, $code, $raw];
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -264,7 +277,6 @@ $students_payload = [
     'medium' => trim($_POST['medium'] ?? 'English'),
     'ancillary_subjects' => trim($_POST['ancillary_subjects'] ?? ''),
     'exam_reg_no' => $exam_reg_no,
-    'reg_no' => $exam_reg_no,
     'current_semester' => $current_semester,
     'sem1_marks' => $sem_marks_json['sem1_marks'] ?? null,
     'sem2_marks' => $sem_marks_json['sem2_marks'] ?? null,
@@ -358,7 +370,7 @@ foreach ($bio_payload as $k => $v) {
 // ==========================================
 // C. UMIS_STUDENTS TABLE PAYLOAD (All Fields)
 // ==========================================
-$clean_stu_id = 'STU_' . preg_replace('/[^A-Za-z0-9]/', '', $roll_no);
+$clean_stu_id = 'STU_' . (preg_replace('/[^A-Za-z0-9]/', '', $roll_no ?: $exam_reg_no) ?: substr(md5(uniqid()), 0, 8));
 $raw_family_inc = $_POST['family_income'] ?? ($_POST['parent_income'] ?? null);
 
 $umis_payload = [
@@ -444,7 +456,6 @@ $umis_payload = [
     'counselling_no' => trim($_POST['counselling_no'] ?? ''),
     'roll_no' => $roll_no,
     'exam_reg_no' => $exam_reg_no,
-    'reg_no' => $exam_reg_no,
     'is_lateral_entry' => trim($_POST['is_lateral_entry'] ?? 'No'),
     'is_hosteller' => ($accommodation === 'Hostel' || ($_POST['is_hosteller'] ?? '') === 'Yes') ? 'Yes' : 'No',
     'current_status' => trim($_POST['current_status'] ?? 'Studying in this Institute'),
@@ -470,8 +481,8 @@ $table_results = [];
 list($s_ok, $s_code, $s_err) = safeSupabaseWrite($SUPABASE_URL, 'students', 'exam_reg_no', $exam_reg_no, $students_payload, $SUPABASE_KEY);
 $table_results['Student Record (students)'] = ['ok' => $s_ok, 'code' => $s_code, 'raw' => $s_err];
 
-// B. Write bio_data table (Match on tamil_reg_no or exam_reg_no)
-list($b_ok, $b_code, $b_err) = safeSupabaseWrite($SUPABASE_URL, 'bio_data', 'tamil_reg_no', $exam_reg_no, $bio_payload, $SUPABASE_KEY);
+// B. Write bio_data table (Match on exam_reg_no)
+list($b_ok, $b_code, $b_err) = safeSupabaseWrite($SUPABASE_URL, 'bio_data', 'exam_reg_no', $exam_reg_no, $bio_payload, $SUPABASE_KEY);
 $table_results['Bio Data (bio_data)'] = ['ok' => $b_ok, 'code' => $b_code, 'raw' => $b_err];
 
 // C. Write umis_students table (Match on roll_no or exam_reg_no)

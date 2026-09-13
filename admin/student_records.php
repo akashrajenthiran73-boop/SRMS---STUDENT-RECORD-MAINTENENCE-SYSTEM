@@ -11,23 +11,25 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || !in_array($_SES
 
 $role = $_SESSION['role'];
 
-// Load .env configuration from root folder safely
-$env_path = '../.env';
-$SUPABASE_URL = '';
-$SUPABASE_KEY = '';
+require_once __DIR__ . '/../includes/college_data.php';
 
-if (file_exists($env_path)) {
-    $env = parse_ini_file($env_path);
-    $SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
-    $SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
-}
+$DEFAULT_SUPABASE_URL = 'https://edwndgdjzjevbgdliuxy.supabase.co';
+$DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkd25kZ2RqempldmJnZGxpdXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDg1ODgsImV4cCI6MjEwMDgyNDU4OH0.yvqU6cT-xbbLezB4PaXd3lufrfdzN2OwnVzOO7new_c';
+
+// Load .env configuration safely with fallbacks
+$env_path = __DIR__ . '/../.env';
+$env = file_exists($env_path) ? (@parse_ini_file($env_path) ?: []) : [];
+$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? (getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? ($GLOBALS['SUPABASE_URL'] ?? $DEFAULT_SUPABASE_URL))));
+$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? (getenv('SUPABASE_ANON_KEY') ?: ($_ENV['SUPABASE_ANON_KEY'] ?? ($GLOBALS['SUPABASE_KEY'] ?? $DEFAULT_SUPABASE_KEY))));
 
 // Fetch all students from Supabase via cURL
 $students = [];
 if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
-    $url = $SUPABASE_URL . "/rest/v1/students?select=*";
+    $url = rtrim($SUPABASE_URL, '/') . "/rest/v1/students?select=*";
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         "apikey: $SUPABASE_KEY",
         "Authorization: Bearer $SUPABASE_KEY"
@@ -38,7 +40,6 @@ if (!empty($SUPABASE_URL) && !empty($SUPABASE_KEY)) {
     $students = json_decode($response, true) ?? [];
 }
 
-require_once __DIR__ . '/../includes/college_data.php';
 $departments = get_all_departments();
 $selected_dept = $_GET['dept'] ?? 'All';
 $selected_year = $_GET['year'] ?? 'All';

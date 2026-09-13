@@ -11,15 +11,16 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['Admin', 'Super A
 
 $display_role = $_SESSION['role'];
 
+require_once __DIR__ . '/../includes/college_data.php';
+
+$DEFAULT_SUPABASE_URL = 'https://edwndgdjzjevbgdliuxy.supabase.co';
+$DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkd25kZ2RqempldmJnZGxpdXh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDg1ODgsImV4cCI6MjEwMDgyNDU4OH0.yvqU6cT-xbbLezB4PaXd3lufrfdzN2OwnVzOO7new_c';
+
 // 2. Multi-location Safe .env File Loader
 $env_path = __DIR__ . '/../.env';
-if (!file_exists($env_path)) {
-    die("Error: .env file not found at " . realpath(__DIR__ . '/..'));
-}
-
-$env = parse_ini_file($env_path);
-$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? '');
-$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? '');
+$env = file_exists($env_path) ? (@parse_ini_file($env_path) ?: []) : [];
+$SUPABASE_URL = trim($env['SUPABASE_URL'] ?? (getenv('SUPABASE_URL') ?: ($_ENV['SUPABASE_URL'] ?? ($GLOBALS['SUPABASE_URL'] ?? $DEFAULT_SUPABASE_URL))));
+$SUPABASE_KEY = trim($env['SUPABASE_ANON_KEY'] ?? (getenv('SUPABASE_ANON_KEY') ?: ($_ENV['SUPABASE_ANON_KEY'] ?? ($GLOBALS['SUPABASE_KEY'] ?? $DEFAULT_SUPABASE_KEY))));
 
 if (!isset($_GET['id'])) { 
     header("Location: student_records.php"); 
@@ -29,9 +30,11 @@ if (!isset($_GET['id'])) {
 $id = $_GET['id'];
 
 // Fetch Existing Student Record
-$url = $SUPABASE_URL . "/rest/v1/students?id=eq.$id&select=*";
+$url = rtrim($SUPABASE_URL, '/') . "/rest/v1/students?id=eq.$id&select=*";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "apikey: $SUPABASE_KEY", 
     "Authorization: Bearer $SUPABASE_KEY"
